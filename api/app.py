@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS
+# from flask_cors import CORS
 import pymongo
 import random
 import os
@@ -16,7 +16,7 @@ db = client['db']
 coll = db['coll']
 
 app = Flask(__name__, static_folder='static')
-CORS(app)
+# CORS(app)
 
 @app.route('/')
 def index():

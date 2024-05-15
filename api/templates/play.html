@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <style>
+      * {
+        font-family: "Poetsen One", sans-serif;
+        font-weight: 100;
+        font-style: normal;
+      }
+
+      h1 {
+        font-size: 3em;
+        color: #ffffff;
+        text-align: center;
+        margin: 20px 0;
+        margin-bottom: 0px;
+      }
+
+      h2 {
+        font-size: 2em;
+        color: #f7f7f7;
+        text-align: center;
+        margin: 0;
+      }
+
+      body::-webkit-scrollbar {
+        display: none; /* Hide the scrollbar */
+      }
+
+      .container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 500px;
+        height: calc(90vh - 70px);
+        margin: 10px;
+        background: #000000d0;
+        padding: 20px;
+        border-radius: 1rem;
+        overflow: scroll;
+
+        display: block;
+        text-align: center;
+        align-content: center;
+      }
+
+      button {
+        background: #4285f4;
+        font-family: "Poetsen One", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        padding: 0.6em 1.3em;
+        font-size: 18px;
+        border: 3px solid #000000;
+        border-radius: 0.4em;
+        box-shadow: 0.15em 0.15em #ffffff;
+        cursor: pointer;
+        color: #ffffff;
+      }
+
+      button:hover {
+        transform: translate(-0.05em, -0.05em);
+        box-shadow: 0.2em 0.2em #ffffff;
+      }
+
+      button:active {
+        transform: translate(0.05em, 0.05em);
+        box-shadow: 0.05em 0.05em #ffffff;
+      }
+
+      #players {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .player-card {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 7px 15px;
+        margin: 5px 0;
+        cursor: pointer;
+        transition: 0.3s;
+        border-radius: 20px;
+        border: 3px solid #d1d1d1;
+      }
+
+      .player-image {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+      }
+
+      .player-info {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      .player-details {
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        flex: 1;
+      }
+
+      .player-details > h3 {
+        text-align: left;
+      }
+
+      .player-details > h5 {
+        text-align: left;
+      }
+
+      h3 {
+        font-size: 1.25em;
+        color: #d1d1d1;
+        text-align: center;
+        margin: 0px 0;
+      }
+
+      h5 {
+        font-size: 0.75em;
+        color: #d1d1d1;
+        margin-top: 0px;
+        margin-bottom: 5px;
+        display: block;
+        text-align: center;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        --color: rgba(114, 114, 114, 0.3);
+        background-color: #1d1d1d;
+        background-image: linear-gradient(
+            0deg,
+            transparent 24%,
+            var(--color) 25%,
+            var(--color) 26%,
+            transparent 27%,
+            transparent 74%,
+            var(--color) 75%,
+            var(--color) 76%,
+            transparent 77%,
+            transparent
+          ),
+          linear-gradient(
+            90deg,
+            transparent 24%,
+            var(--color) 25%,
+            var(--color) 26%,
+            transparent 27%,
+            transparent 74%,
+            var(--color) 75%,
+            var(--color) 76%,
+            transparent 77%,
+            transparent
+          );
+        background-size: 55px 55px;
+      }
+    </style>
+    <style>
+      .flip-card {
+        background-color: transparent;
+        width: 190px;
+        height: 254px;
+        perspective: 1000px;
+        font-family: sans-serif;
+        display: none;
+      }
+
+      .title {
+        font-size: 1.5em;
+        text-align: center;
+        margin: 0;
+      }
+
+      .flip-card:hover {
+        cursor: pointer;
+      }
+
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+      }
+
+      .flip-card-front,
+      .flip-card-back {
+        box-shadow: 0 8px 14px 0 rgba(255, 255, 0, 0.2);
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border: 3px solid #ffffff;
+        border-radius: 1rem;
+      }
+
+      .flip-card-front {
+        background: #4285f4;
+        color: white;
+        border: 3px solid #d4e5ff;
+        box-shadow: 0 8px 14px 0 rgba(66, 133, 244, 0.2);
+      }
+
+      .flip-card-back {
+        background: linear-gradient(
+          120deg,
+          gold 30%,
+          goldenrod 88%,
+          bisque 40%,
+          goldenrod 78%
+        );
+        color: #1d1d1d;
+        transform: rotateY(180deg);
+      }
+    </style>
+    <style>
+      .label {
+        display: flex;
+        align-items: center;
+        border-radius: 100px;
+        padding: 14px 16px;
+        margin: 5px 0;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .label:hover,
+      .label:focus-within,
+      .label:active {
+        background: hsla(0, 0%, 80%, 0.14);
+      }
+
+      .radio-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        z-index: -1;
+      }
+
+      .radio-design {
+        width: 22px;
+        height: 22px;
+        border-radius: 100px;
+        background: #4285f4;
+        position: relative;
+      }
+
+      .radio-design::before {
+        content: "";
+        display: inline-block;
+        width: inherit;
+        height: inherit;
+        border-radius: inherit;
+        background: hsl(0, 0%, 90%);
+        transform: scale(1.1);
+        transition: 0.3s;
+      }
+
+      .radio-input:checked + .radio-design::before {
+        transform: scale(0);
+      }
+
+      .label-text {
+        color: hsl(0, 0%, 60%);
+        margin-left: 14px;
+        letter-spacing: 3px;
+
+        transition: 0.3s;
+      }
+
+      .radio-input:checked ~ .label-text {
+        color: hsl(0, 0%, 100%);
+      }
+    </style>
+
+    <style>
+      @media screen and (max-width: 768px) {
+        /* Adjust styles for smaller screens */
+        .container {
+          width: 80%;
+          max-width: 100%;
+          margin: 5px;
+          height: calc(82vh - 70px);
+        }
+        button {
+          width: 95%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <div id="container2"> -->
+    <h1>MAFIA</h1>
+    <div class="container" id="main-container">
+      <br />
+      <h2 id="headLine">Waiting Room</h2>
+      <br />
+      <div id="startGameDiv" style="display: none">
+        <button onclick="startGame()">Start Game</button>
+      </div>
+      <br />
+      <h3 style="text-align: center; cursor: pointer" id="gameCodeShare">
+        Game Code: <span id="gameCode"></span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 448 512"
+          style="width: 16px; height: 16px"
+        >
+          <path
+            style="fill: #d1d1d1"
+            d="M208 0H332.1c12.7 0 24.9 5.1 33.9 14.1l67.9 67.9c9 9 14.1 21.2 14.1 33.9V336c0 26.5-21.5 48-48 48H208c-26.5 0-48-21.5-48-48V48c0-26.5 21.5-48 48-48zM48 128h80v64H64V448H256V416h64v48c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V176c0-26.5 21.5-48 48-48z"
+          />
+        </svg>
+      </h3>
+
+      <br />
+      <h3 id="message">All Players</h3>
+      <br />
+
+      <div id="players"></div>
+
+      <br />
+
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <p class="title">Role Card</p>
+            <p>Click Me</p>
+          </div>
+          <div class="flip-card-back">
+            <p>Your Role</p>
+            <p id="role-card-title" class="title">MAFIA</p>
+            <p id="role-card-desc">
+              You have to secretly kill the good guys while pretending to be one
+              of them, so you can win.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <br />
+
+      <div id="radio-list" style="display: none" class="radio-input-wrapper">
+        <label class="label">
+          <input
+            value="value-1"
+            name="value-radio"
+            id="value-1"
+            class="radio-input"
+            type="radio"
+          />
+          <div class="radio-design"></div>
+          <div class="label-text">Player 1</div>
+        </label>
+        <label class="label">
+          <input
+            value="value-2"
+            name="value-radio"
+            id="value-2"
+            class="radio-input"
+            type="radio"
+          />
+          <div class="radio-design"></div>
+          <div class="label-text">Player 2</div>
+        </label>
+        <label class="label">
+          <input
+            value="value-3"
+            name="value-radio"
+            id="value-3"
+            class="radio-input"
+            type="radio"
+          />
+          <div class="radio-design"></div>
+          <div class="label-text">Player 3</div>
+        </label>
+      </div>
+
+      <br />
+      <button id="submitBtn" style="display: none" onclick="submit()">
+        Submit
+      </button>
+      <br />
+      <h5 id="btmMessage"></h5>
+    </div>
+
+    <script>
+      let ishost = false;
+      let hostcode = "";
+      let currState = "1";
+      let gamecode = "";
+      let playername = "";
+      let role = "";
+      let nextStateTime = 0;
+      let alivePlayers = [];
+      let deadPlayers = [];
+      let lastKilled = "";
+      let policeSusp = false;
+      let votedPlayer = "";
+      let wasVotedMafia = false;
+      let finalResults = false;
+      let mafiaWon = null;
+      let playerRoles = {};
+
+      // read parameters from URL
+      const urlObj = new URL(window.location.href);
+      let url = urlObj.origin;
+
+      //load audio
+      var clickAudio = new Audio(`${url}/static/audio/click.mp3`);
+      var selectAudio = new Audio(`${url}/static/audio/select.mp3`);
+      var votedAudio = new Audio(`${url}/static/audio/voted.mp3`);
+      var killedAudio = new Audio(`${url}/static/audio/killed.mp3`);
+      var gotKilledAudio = new Audio(`${url}/static/audio/got_killed.mp3`);
+      var night_horrorAudio = new Audio(`${url}/static/audio/night_horror.mp3`);
+      var suspenseAudio = new Audio(`${url}/static/audio/suspense.mp3`);
+
+      // create variables for elements
+      var headLine = document.getElementById("headLine");
+      console.log("Headline: ", headLine.textContent);
+      var mess = document.getElementById("message");
+      var btmMessage = document.getElementById("btmMessage");
+      var submitBtn = document.getElementById("submitBtn");
+      var radioList = document.getElementById("radio-list");
+
+      // read data from local storage(if available)
+      var localGameCode = localStorage.getItem("gameCode");
+      var localHostcode = localStorage.getItem("hostCode");
+      var localPlayername = localStorage.getItem("playerName");
+      if (localGameCode == null || localPlayername == null) {
+        window.removeEventListener("beforeunload", confirmExit);
+        window.location.href = `${url}/join`;
+      }
+      gamecode = localGameCode;
+      playername = localPlayername;
+      if (localHostcode != null) {
+        hostcode = localHostcode;
+        ishost = true;
+      }
+
+      // show game code
+      document.getElementById("gameCode").textContent = gamecode;
+      document.getElementById("gameCodeShare").addEventListener("click", () => {
+        var toCopy = `${url}/join?code=${gamecode}`;
+        console.log("Copying to clipboard: ", toCopy);
+
+        navigator.clipboard.writeText(toCopy);
+        toast("Game link copied.", "#0F9D58");
+      });
+
+      if (ishost) {
+        showPlayers();
+        document.getElementById("startGameDiv").style.display = "block";
+      } else {
+        showWaitingMessage();
+      }
+
+      function toast(message, color, duration = 2000) {
+        var toast = document.createElement("div");
+        toast.textContent = message;
+        toast.style.position = "fixed";
+        toast.style.top = "10%";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.backgroundColor = color;
+        toast.style.color = "#fff";
+        toast.style.padding = "10px";
+        toast.style.borderRadius = "5px";
+        toast.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.5)";
+        toast.style.zIndex = "9999";
+        document.body.appendChild(toast);
+        setTimeout(function () {
+          toast.remove();
+        }, duration);
+      }
+
+      function showWaitingMessage(message = "Waiting for host to start...") {
+        var playersMessage = document.getElementById("message");
+        playersMessage.textContent = message;
+        headLine.textContent = "";
+        pollState();
+      }
+
+      function pollState() {
+        var intervalId = setInterval(() => {
+          fetch(`${url}/state_poll/${gamecode}/${currState}/${playername}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if ("stop" in data) {
+                // go to spectator page
+                window.removeEventListener("beforeunload", confirmExit);
+                window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+                return;
+              }
+              document.getElementById("players").innerHTML = "";
+              if (data["status"] == "wait") {
+                // show waiting message and update players list from data["players"]
+                if (currState == "1") {
+                  mess.textContent = "Waiting for host to start the game...";
+                } else if (currState == "2") {
+                  mess.textContent = "Waiting for following players...";
+                } else if (currState == "3") {
+                  mess.textContent =
+                    "Waiting for following players to choose...";
+                } else if (currState == "4") {
+                  mess.textContent =
+                    "Waiting for following players to complete voting...";
+                }
+
+                if (data.hasOwnProperty("players")) {
+                  // add text "Players:"
+                  data["players"].forEach((player) => {
+                    showPlayerCards(player);
+                  });
+                } else if (data.hasOwnProperty("waiting_players")) {
+                  data["waiting_players"].forEach((player) => {
+                    showPlayerCards(player);
+                  });
+                }
+              } else if (data["status"] == "update") {
+                clearInterval(intervalId);
+                // clear the players list and everything else
+                if (currState == "1") {
+                  // show message "You are getting your role...Shh!🤫 Keep it secret"
+                  document.getElementById("gameCodeShare").style.display =
+                    "none";
+                  mess.innerHTML =
+                    "You are getting your <span style='color: #FBBC05'>role</span>...  Shh!🤫 Keep it secret";
+                  role = data["role"];
+                  nextStateTime = parseInt(data["next_state_time"]);
+                } else if (currState == "2") {
+                  // show message "It's time to choose someone.. Be careful!👀"
+                  mess.textContent =
+                    "It's time to choose someone.. Be careful!👀";
+
+                  nextStateTime = parseInt(data["next_state_time"]);
+                  alivePlayers = data["alive"];
+                  deadPlayers = data["dead"];
+                } else if (currState == "3") {
+                  // show message "Curious to know what happened last night??🤔"
+                  mess.textContent =
+                    "Excited to know what happened last night??🤔";
+
+                  // play suspense sound
+                  suspenseAudio.play();
+
+                  nextStateTime = parseInt(data["next_state_time"]);
+                  lastKilled = data["last_killed"];
+                  policeSusp = data["police_susp"];
+                  alivePlayers = data["alive"];
+                  deadPlayers = data["dead"];
+                  mafiaWon = data["mafia_won"];
+                  finalResults = data["final_results"];
+                  if (finalResults == true) {
+                    playerRoles = data["player_roles"];
+                  }
+                } else if (currState == "4") {
+                  // show message "Voting Results are out... Let's see who is eliminated"
+                  mess.textContent =
+                    "Voting Results are out... Let's see who is eliminated";
+
+                  // play suspense sound
+                  suspenseAudio.play();
+
+                  nextStateTime = parseInt(data["next_state_time"]);
+                  votedPlayer = data["voted_out"];
+                  wasVotedMafia = data["was_voted_mafia"];
+                  mafiaWon = data["mafia_won"];
+                  finalResults = data["final_results"];
+                  if (finalResults == true) {
+                    playerRoles = data["player_roles"];
+                  }
+                }
+                updateState();
+              }
+            });
+        }, 3000);
+      }
+
+      function updateState() {
+        if (currState == "1") {
+          currState = "2";
+          console.log("State 1 to 2");
+          console.log("Role: ", role);
+          // show role on time(nextStateTime)
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              headLine.textContent = "Role Card";
+              showRoleCard();
+            }, timeDiff);
+          }
+        } else if (currState == "2") {
+          currState = "3";
+          console.log("State 2 to 3");
+          console.log("Alive players: ", alivePlayers);
+          console.log("Dead players: ", deadPlayers);
+
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              headLine.textContent = "Selection Time";
+
+              // show the title as per role
+              mess.textContent = "Remember your role and choose wisely";
+
+              radioList.innerHTML = "";
+              radioList.style.display = "block";
+
+              // show the list of alive players as radio buttons and add a submit button
+              alivePlayers.forEach((player) => {
+                if (player !== playername) {
+                  addPlayerRadio(player);
+                }
+              });
+
+              makeRadioBtnSound();
+
+              submitBtn.style.display = "block";
+            }, timeDiff);
+          }
+        } else if (currState == "3") {
+          currState = "4";
+          console.log("State 3 to 4");
+          console.log("Last killed: ", lastKilled);
+          console.log("Police suspicion: ", policeSusp);
+
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              // show last night details
+              (async function () {
+                await showLastNightDetails();
+                if (finalResults) {
+                  showFinalResults();
+                  return;
+                }
+                await showDiscussionRound();
+                await showVotingRound();
+              })();
+            }, timeDiff);
+          }
+        } else if (currState == "4") {
+          currState = "2";
+          console.log("State 4 to 2");
+          console.log("Alive players: ", alivePlayers);
+          console.log("Dead players: ", deadPlayers);
+
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              // Voting results are out
+              (async function () {
+                await show_votingResults();
+                if (finalResults) {
+                  showFinalResults();
+                  return;
+                } else {
+                  // next round
+                  await itsNightNow();
+
+                  // create a random time between 3 to 10 seconds
+                  var timeDiff = Math.floor(Math.random() * 7000) + 3000;
+
+                  setTimeout(() => {
+                    // show role card
+                    seenMyRole();
+                  }, timeDiff);
+                }
+              })();
+            }, timeDiff);
+          }
+        }
+      }
+
+      function showFinalResults() {
+        // remove before unload
+        window.removeEventListener("beforeunload", confirmExit);
+        // redirect to spectator page
+        window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+      }
+
+      async function itsNightNow() {
+        headLine.textContent = "Night Time";
+        // play night sound
+        night_horrorAudio.play();
+        // show frightening message
+        mess.textContent = [
+          "It's Night now... Close your eyes",
+          "The night is alive with danger. Close your eyes and stay aware.",
+          "The night is dark and full of terrors. Be careful.",
+        ][Math.floor(Math.random() * 3)];
+
+        btmMessage.textContent = "We'll continue in 5 seconds";
+
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // wait 10 seconds
+        headLine.textContent = "";
+      }
+      async function show_votingResults() {
+        // Voting results are out
+        headLine.textContent = "Voting Results";
+        let nxtcontent = "";
+        var iAmDead = false;
+        if (votedPlayer == playername) {
+          iAmDead = true;
+        }
+        if (wasVotedMafia) {
+          nxtcontent = `<span style="color: #EA4335">${votedPlayer} was the Mafia</span>`;
+        } else {
+          nxtcontent = `<span style="color: #34A853">${votedPlayer}</span> was not the Mafia`;
+        }
+        if (votedPlayer != "nobody") {
+          // play voted sound
+          votedAudio.play();
+          if (iAmDead) {
+            mess.innerHTML = `<span style="color: #EA4335">You</span> were voted out... & ${nxtcontent}`;
+          } else {
+            mess.innerHTML = `<span style="color: #EA4335">${votedPlayer}</span> was voted out... & ${nxtcontent}`;
+          }
+        } else {
+          mess.innerHTML =
+            '<span style="color: #FBBC05">Nobody</span> was voted out';
+        }
+        btmMessage.textContent = "We'll Continue in 10 seconds";
+
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 10 seconds
+        if (iAmDead) {
+          window.removeEventListener("beforeunload", confirmExit);
+          window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+        }
+      }
+      async function showLastNightDetails() {
+        headLine.textContent = "Last Night";
+        // clear the players list and everything else
+        if (lastKilled == playername) {
+        }
+        var iAmDead = false;
+        if (lastKilled == playername) {
+          // play got_killed sound
+          gotKilledAudio.play();
+          iAmDead = true;
+          mess.innerHTML =
+            '<span style="color: #EA4335">You</span> were killed last night';
+        } else {
+          // play killed sound
+          killedAudio.play();
+          if (lastKilled == "Nobody") {
+            mess.innerHTML =
+              '<span style="color: #34A853">Nobody</span> was killed last night';
+          } else {
+            mess.innerHTML = `Last night <span style="color: #EA4335">${lastKilled}</span> was killed`;
+          }
+
+          if (policeSusp) {
+            mess.innerHTML = mess.innerHTML =
+              mess.innerHTML +
+              ` & Police suspicion was <span style="color: #EA4335">Correct</span>`;
+          } else {
+            mess.innerHTML =
+              mess.innerHTML +
+              ` & Police suspicion was <span style="color: #EA4335">Wrong</span>`;
+          }
+
+          btmMessage.textContent = "We'll Continue in 10 seconds";
+
+          await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 5 seconds
+          if (iAmDead) {
+            window.removeEventListener("beforeunload", confirmExit);
+            window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+          }
+        }
+      }
+      async function showDiscussionRound() {
+        headLine.textContent = "Discussion Round";
+        mess.textContent = "Talk to each other to find the Killer";
+        btmMessage.textContent = "We'll continue in 10 seconds";
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 10 seconds
+        btmMessage.textContent = "";
+      }
+      async function showVotingRound() {
+        // voting round
+        headLine.textContent = "Voting Time";
+        mess.textContent = "Vote for the player you think is Mafia";
+
+        // show the list of alive players as radio buttons(along with skip option) and add a submit button
+        radioList.innerHTML = "";
+        alivePlayers.forEach((player) => {
+          if (player !== playername) {
+            addPlayerRadio(player);
+          }
+        });
+        // add skip option
+        addPlayerRadio("skip");
+
+        makeRadioBtnSound();
+
+        radioList.style.display = "block";
+        submitBtn.style.display = "block";
+      }
+
+      function selected_vote() {
+        radioList.style.display = "none";
+        var vote = document.querySelector(
+          'input[name="value-radio"]:checked'
+        ).value;
+        console.log("Selected vote: ", vote);
+        fetch(`${url}/selected_vote/${gamecode}/${playername}/${vote}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("stop" in data) {
+              // go to spectator page
+              window.removeEventListener("beforeunload", confirmExit);
+              window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+              return;
+            }
+            if ("error" in data) {
+              // show error message
+              toast(data["error"], "red");
+              return;
+            }
+            toast(data["status"], "#0F9D58");
+            // show waiting message
+            showWaitingMessage(
+              "Waiting for following players to complete voting..."
+            );
+          });
+      }
+
+      function selected_target() {
+        radioList.style.display = "none";
+        var target = document.querySelector(
+          'input[name="value-radio"]:checked'
+        ).value;
+        console.log("Selected target: ", target);
+        fetch(`${url}/selected_target/${gamecode}/${playername}/${target}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("stop" in data) {
+              // go to spectator page
+              window.removeEventListener("beforeunload", confirmExit);
+              window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+              return;
+            }
+            if ("error" in data) {
+              // show error message
+              toast(data["error"], "red");
+              return;
+            }
+            toast(data["status"], "#0F9D58");
+            // show waiting message
+            showWaitingMessage("Waiting for following players to choose...");
+          });
+      }
+
+      function showRoleCard() {
+        // Define roles and their meanings
+        const roleDefinitions = {
+          mafia:
+            "Your goal is to kill off all the townspeople without getting caught.",
+          doctor:
+            "You can choose to heal one person per night, preventing them from being killed by the Mafia.",
+          police:
+            "You can investigate one person per night to determine if they are a member of the Mafia.",
+          prankster:
+            "You can choose to prank one person per night, preventing them from performing their role.",
+          civilian:
+            "Your goal is to figure out who the Mafia members are and vote to eliminate them.",
+        };
+
+        mess.textContent = "Here's your role card";
+        // Get the role card elements
+        const roleCardTitle = document.getElementById("role-card-title");
+        const roleCardDesc = document.getElementById("role-card-desc");
+
+        // Set the role card title and description
+        roleCardTitle.textContent = role.toUpperCase();
+        roleCardDesc.textContent = roleDefinitions[role.toLowerCase()];
+
+        // make flip card visible
+        const flipCard = document.querySelector(".flip-card");
+        flipCard.style.display = "flex";
+        flipCard.style.justifyContent = "center";
+        flipCard.style.margin = "0 auto";
+      }
+      var seenRole = false;
+      const flipCard = document.querySelector(".flip-card");
+      flipCard.addEventListener("click", function () {
+        clickAudio.play();
+        const flipCardInner = this.querySelector(".flip-card-inner");
+        if (flipCardInner.style.transform === "rotateY(180deg)") {
+          flipCardInner.style.transform = "rotateY(0deg)";
+        } else {
+          flipCardInner.style.transform = "rotateY(180deg)";
+          if (!seenRole) {
+            seenRole = true;
+            btmMessage.textContent = "We'll continue in 5 seconds";
+            setTimeout(function () {
+              btmMessage.textContent = "";
+              mess.textContent = "It's to choose someone.. Be careful!👀";
+              seenMyRole();
+            }, 5000);
+          }
+        }
+      });
+
+      function seenMyRole() {
+        // make flip card invisible
+        const flipCard = document.querySelector(".flip-card");
+        flipCard.style.display = "none";
+
+        // Call API to indicate that the player has seen their role
+        fetch(`${url}/update_state/${gamecode}/${playername}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("stop" in data) {
+              // go to spectator page
+              window.removeEventListener("beforeunload", confirmExit);
+              window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+              return;
+            }
+            if (data["status"] == "done") {
+              // Now wait for other players to see their roles and
+              console.log("Player role update complete");
+              pollState();
+            }
+          });
+      }
+
+      function startGame() {
+        fetch(`${url}/start_game/${gamecode}/${hostcode}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("stop" in data) {
+              // go to spectator page
+              window.removeEventListener("beforeunload", confirmExit);
+              window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+              return;
+            }
+            if ("error" in data) {
+              // show error message
+              toast(data["error"], "red");
+              return;
+            }
+            toast(data["status"], "#0F9D58");
+            // hide the "Start Game" button
+            document.getElementById("startGameDiv").style.display = "none";
+            // show waiting message
+            showWaitingMessage("Game is about to start...");
+          });
+      }
+
+      var shownPlayers = false;
+      function showPlayers() {
+        if (shownPlayers) {
+          return;
+        }
+        shownPlayers = true;
+        var intervalIdPlayers;
+        function fetchPlayers() {
+          fetch(`${url}/players/${gamecode}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if ("stop" in data) {
+                // go to spectator page
+                window.removeEventListener("beforeunload", confirmExit);
+                window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+                return;
+              }
+              var playersDiv = document.getElementById("players");
+              playersDiv.innerHTML = "";
+              data.forEach((player) => {
+                showPlayerCards(player);
+              });
+            });
+        }
+        intervalIdPlayers = setInterval(fetchPlayers, 3000);
+
+        function stopFetchingPlayers() {
+          clearInterval(intervalIdPlayers);
+        }
+
+        // Stop fetching players on start game
+        document
+          .getElementById("startGameDiv")
+          .addEventListener("click", stopFetchingPlayers);
+      }
+
+      function showPlayerCards(playerName) {
+        const players = document.getElementById("players");
+
+        const playerCard = document.createElement("div");
+        playerCard.classList.add("player-card");
+
+        const playerInfo = document.createElement("div");
+        playerInfo.classList.add("player-info");
+
+        const playerImage = document.createElement("img");
+        playerImage.src =
+          "https://cdn-icons-png.flaticon.com/512/2042/2042895.png";
+        playerImage.alt = "Player Image";
+        playerImage.classList.add("player-image");
+        playerInfo.appendChild(playerImage);
+
+        const playerDetails = document.createElement("div");
+        playerDetails.classList.add("player-details");
+
+        const playerHeading = document.createElement("h3");
+        playerHeading.textContent = playerName;
+        playerDetails.appendChild(playerHeading);
+
+        const playerDescription = document.createElement("h5");
+        playerDescription.textContent = `Player`;
+        playerDetails.appendChild(playerDescription);
+
+        playerInfo.appendChild(playerDetails);
+
+        playerCard.appendChild(playerInfo);
+        players.appendChild(playerCard);
+      }
+
+      function addPlayerRadio(playerName) {
+        // Create the label element
+        const label = document.createElement("label");
+        label.classList.add("label");
+
+        // Create the input element
+        const input = document.createElement("input");
+        input.setAttribute("type", "radio");
+        input.setAttribute("name", "value-radio");
+        input.setAttribute("value", playerName);
+        input.classList.add("radio-input");
+
+        // Create the radio design div
+        const radioDesign = document.createElement("div");
+        radioDesign.classList.add("radio-design");
+
+        // Create the label text div
+        const labelText = document.createElement("div");
+        labelText.classList.add("label-text");
+        labelText.textContent = playerName;
+
+        // Append the input, radio design, and label text to the label
+        label.appendChild(input);
+        label.appendChild(radioDesign);
+        label.appendChild(labelText);
+
+        radioList.appendChild(label);
+      }
+
+      function submit() {
+        var target = document.querySelector(
+          'input[name="value-radio"]:checked'
+        );
+        if (target == null) {
+          toast("Please select a player", "red");
+          return;
+        }
+        clickAudio.play();
+        submitBtn.style.display = "none";
+        if (currState == "3") {
+          selected_target();
+        } else if (currState == "4") {
+          selected_vote();
+        }
+      }
+
+      function makeRadioBtnSound() {
+        var radioInputs = document.querySelectorAll(".radio-input");
+        radioInputs.forEach(function (radioInput) {
+          radioInput.addEventListener("click", function () {
+            selectAudio.play();
+          });
+        });
+      }
+
+      // prevent going back
+      function confirmExit(event) {
+        // Cancel the event
+        event.preventDefault();
+        // Chrome requires returnValue to be set
+        event.returnValue = "";
+
+        // Show a confirmation dialog
+        const confirmationMessage =
+          "Are you sure you want to leave? Whole game will be lost.";
+        event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+        return confirmationMessage; // Gecko, WebKit, Chrome <34
+      }
+      window.addEventListener("beforeunload", confirmExit);
+    </script>
+  </body>
+</html>

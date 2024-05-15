@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia Game - Spectating</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #container {
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h1, h2, h3, p {
+            margin: 0;
+            padding: 0;
+            color: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 5px;
+        }
+
+        strike {
+            color: #EA4335;
+        }
+
+        .header {
+            margin-bottom: 10px;
+        }
+
+        .players-list {
+            margin-top: 20px;
+        }
+
+        .players-list h3 {
+            margin-top: 10px;
+        }
+
+        .players-list p {
+            margin: 5px 0;
+        }
+
+        .result-text {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .mafia-won {
+            color: #EA4335;
+        }
+
+        .mafia-lost {
+            color: #34A853;
+        }
+
+        @media only screen and (max-width: 600px) {
+            #container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1>🌕 Mafia Game - Spectating 🌕</h1>
+    <div class="players-list" id="players"></div>
+</div>
+<script>
+    let urlParams = new URLSearchParams(window.location.search);
+    let gamecode = urlParams.get("code");
+
+    if (!gamecode) {
+        gamecode = prompt("Please enter the game code:");
+    }
+
+    let url = window.location.href.split("/")[0];
+
+    function fetchPlayers() {
+        fetch(`${url}/spectator/${gamecode}`)
+            .then((response) => response.json())
+            .then((data) => {
+                let playersDiv = document.getElementById("players");
+                playersDiv.innerHTML = "";
+
+                let finalResults = data["final_results"];
+                let mafiaWon = data["mafia_won"];
+                let playerRoles = data["player_roles"];
+                if (finalResults) {
+                    let finalResultsHeader = document.createElement("div");
+                    finalResultsHeader.classList.add('header');
+                    finalResultsHeader.innerHTML = "<p class='result-text'>🎉 Final Results</p>";
+                    playersDiv.appendChild(finalResultsHeader);
+
+                    if (mafiaWon) {
+                        let mafiaWonText = document.createElement("h2");
+                        mafiaWonText.classList.add('result-text', 'mafia-won');
+                        mafiaWonText.textContent = "Mafia won the game 🦹‍♂️";
+                        playersDiv.appendChild(mafiaWonText);
+                    } else {
+                        let mafiaLostText = document.createElement("h2");
+                        mafiaLostText.classList.add('result-text', 'mafia-lost');
+                        mafiaLostText.textContent = "Mafia lost the game 🦸‍♂️";
+                        playersDiv.appendChild(mafiaLostText);
+                    }
+
+                    playersDiv.appendChild(document.createElement("hr"));
+
+                    let playerRolesHeader = document.createElement("div");
+                    playerRolesHeader.classList.add('header');
+                    playerRolesHeader.innerHTML = "<p class='result-text'>🎭 Player Roles</p>";
+                    playersDiv.appendChild(playerRolesHeader);
+
+                    playerRoles.forEach((player) => {
+                        let p = document.createElement("h3");
+                        if (player.alive) {
+                            p.innerHTML = `👤 ${player.name} - ${player.role}`;
+                        } else {
+                            p.innerHTML = `<strike>👤 ${player.name} - ${player.role}</strike>`;
+                        }
+                        playersDiv.appendChild(p);
+                    });
+                } else {
+                    let finalResultsHeader = document.createElement("div");
+                    finalResultsHeader.classList.add('header');
+                    finalResultsHeader.innerHTML = "<p class='result-text'>🕒 Game is still ongoing</p>";
+                    playersDiv.appendChild(finalResultsHeader);
+
+                    let livePlayers = data["alive"];
+                    let deadPlayers = data["dead"];
+
+                    let livePlayersHeader = document.createElement("h3");
+                    livePlayersHeader.textContent = "👥 Alive Players:";
+                    playersDiv.appendChild(livePlayersHeader);
+
+                    livePlayers.forEach((player) => {
+                        let p = document.createElement("p");
+                        p.textContent = `🟢 ${player}`;
+                        playersDiv.appendChild(p);
+                    });
+
+                    let deadPlayersHeader = document.createElement("h3");
+                    deadPlayersHeader.textContent = "💀 Dead Players:";
+                    playersDiv.appendChild(deadPlayersHeader);
+
+                    deadPlayers.forEach((player) => {
+                        let p = document.createElement("p");
+                        p.textContent = `🔴 ${player}`;
+                        playersDiv.appendChild(p);
+                    });
+                }
+            });
+    }
+
+    if (gamecode) {
+        fetchPlayers();
+        setInterval(fetchPlayers, 3000); // Refresh players list every 3 seconds
+    }
+</script>
+</body>
+</html>

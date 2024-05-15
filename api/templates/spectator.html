@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        font-family: "Poetsen One", sans-serif;
+        font-weight: 100;
+        font-style: normal;
+      }
+
+      h1 {
+        font-size: 3em;
+        color: #ffffff;
+        text-align: center;
+        margin: 20px 0;
+        margin-bottom: 0px;
+      }
+
+      h4 {
+        font-size: 1.5em;
+        color: #d1d1d1;
+        text-align: center;
+        margin: 5px 0;
+        margin-bottom: 0px;
+      }
+
+      h3 {
+        font-size: 2em;
+        color: #f3f3f3;
+        text-align: center;
+        margin: 5px 0;
+        margin-top: 5px;
+      }
+
+      h6 {
+        font-size: 1.5em;
+        color: #d1d1d1;
+        text-align: center;
+        margin: 5px 0;
+        margin-top: 5px;
+      }
+
+      #players {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .player-card {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 7px 15px;
+        margin: 5px 0;
+        cursor: pointer;
+        transition: 0.3s;
+        border-radius: 20px;
+        border: 3px solid #d1d1d1;
+      }
+
+      .player-image {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+      }
+
+      .player-info {
+        display: flex;
+        align-items: center;
+      }
+
+      .player-details {
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+      }
+
+      .player-details > h3 {
+        text-align: left;
+      }
+
+      h5 {
+        font-size: 1em;
+        color: #f3f3f3;
+        margin-top: -5px;
+        margin-bottom: 5px;
+      }
+
+      strike {
+        text-decoration-color: #ea4435cf;
+        text-decoration-thickness: 4px; /* Increase the width of the strike line */
+      }
+
+      strike::before {
+        background-color: white; /* Set text color to white */
+      }
+
+      body::-webkit-scrollbar {
+        display: none; /* Hide the scrollbar */
+      }
+
+      .container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 500px; /* Maximum width for container */
+        height: calc(90vh - 70px); /* Subtract the height of the title (70px) */
+        margin: 10px;
+        background: #000000d0;
+        padding: 20px;
+        border-radius: 1rem;
+        overflow: auto;
+        display: grid;
+        place-items: center;
+      }
+
+      button {
+        background: #4285f4;
+        font-family: "Poetsen One", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        padding: 0.6em 1.3em;
+        font-size: 18px;
+        border: 3px solid #000000;
+        border-radius: 0.4em;
+        box-shadow: 0.15em 0.15em #ffffff;
+        cursor: pointer;
+        color: #ffffff;
+      }
+
+      button:hover {
+        transform: translate(-0.05em, -0.05em);
+        box-shadow: 0.2em 0.2em #ffffff;
+      }
+
+      button:active {
+        transform: translate(0.05em, 0.05em);
+        box-shadow: 0.05em 0.05em #ffffff;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        --color: rgba(114, 114, 114, 0.3);
+        background-color: #1d1d1d;
+        background-image: linear-gradient(
+            0deg,
+            transparent 24%,
+            var(--color) 25%,
+            var(--color) 26%,
+            transparent 27%,
+            transparent 74%,
+            var(--color) 75%,
+            var(--color) 76%,
+            transparent 77%,
+            transparent
+          ),
+          linear-gradient(
+            90deg,
+            transparent 24%,
+            var(--color) 25%,
+            var(--color) 26%,
+            transparent 27%,
+            transparent 74%,
+            var(--color) 75%,
+            var(--color) 76%,
+            transparent 77%,
+            transparent
+          );
+        background-size: 55px 55px;
+      }
+
+      @media screen and (max-width: 768px) {
+        /* Adjust styles for smaller screens */
+        .container {
+          width: 80%;
+          max-width: 100%;
+          margin: 5px;
+          height: calc(82vh - 70px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>MAFIA</h1>
+    <div class="container">
+      <h4 id="gameid">Spectating game -</h4>
+      <h3 id="results">Mafia won the game 😎🎉</h3>
+      <hr style="width: 100%" />
+      <h6>Players & Roles</h6>
+
+      <div id="players">
+        <div class="player-card">
+          <div class="player-info">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/2042/2042895.png"
+              alt="Player Image"
+              class="player-image"
+            />
+            <div class="player-details">
+              <h3>Meet</h3>
+              <h5>Mafia</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br />
+      <button style="display: none" id="joinGame" onclick="joinGame()">
+        Join Game
+      </button>
+      <button style="display: none" id="startGame" onclick="startGame()">
+        Start Game
+      </button>
+
+      <br />
+    </div>
+    <script>
+      function toast(message, color, duration = 2000) {
+        var toast = document.createElement("div");
+        toast.textContent = message;
+        toast.style.position = "fixed";
+        toast.style.top = "10%";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.backgroundColor = color;
+        toast.style.color = "#fff";
+        toast.style.padding = "10px";
+        toast.style.borderRadius = "5px";
+        toast.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.5)";
+        toast.style.zIndex = "9999";
+        document.body.appendChild(toast);
+        setTimeout(function () {
+          toast.remove();
+        }, duration);
+      }
+
+      function joinGame() {
+        (async function () {
+          await clickAudio.play();
+          if (!gameEnded) {
+            toast("Game is still ongoing", "#EA4335");
+          } else {
+            let name = urlParams.get("name");
+            var nextloc = `${url}/join?code=${gamecode}`;
+            if (name != null) {
+              nextloc += `&name=${name}`;
+            }
+            window.location.href = nextloc;
+          }
+        })();
+      }
+
+      let urlParams = new URLSearchParams(window.location.search);
+      let gamecode = urlParams.get("code");
+
+      if (!gamecode) {
+        gamecode = prompt("Please enter the game code:");
+      }
+
+      const urlObj = new URL(window.location.href);
+      let url = urlObj.origin;
+
+      var clickAudio = new Audio(`${url}/static/audio/click.mp3`);
+
+      var iAmHost = false;
+      var localGameCode = localStorage.getItem("gameCode");
+      var localHostCode = localStorage.getItem("hostCode");
+      var localPlayerName = localStorage.getItem("playerName");
+      console.log(localHostCode == null);
+      if (gamecode == localGameCode) {
+        if (localHostCode != null) {
+          iAmHost = true;
+        }
+      }
+
+      // get data from localsotrage
+      let gameHost = localStorage.getItem("gameHost");
+      let game;
+
+      function fetchPlayers() {
+        fetch(`${url}/spectator/${gamecode}`)
+          .then((response) => response.json())
+          .then((data) => {
+            let playersDiv = document.getElementById("players");
+            playersDiv.innerHTML = "";
+
+            let finalResults = data["final_results"];
+            gameEnded = finalResults;
+            let mafiaWon = data["mafia_won"];
+            let playerRoles = data["player_roles"];
+
+            if (finalResults) {
+              console.log("I am host: ", iAmHost);
+              if (iAmHost) {
+                document.getElementById("startGame").style.display = "block";
+              } else {
+                document.getElementById("joinGame").style.display = "block";
+              }
+              clearInterval(fetchPlayersInterval);
+
+              let resultsText = document.getElementById("results");
+
+              if (mafiaWon) {
+                resultsText.textContent = "Mafia won the game 🦹‍♂️😎";
+                // play win audio
+                var winAudio = new Audio(`${url}/static/audio/win.mp3`);
+                winAudio.play();
+              } else {
+                resultsText.textContent = "Mafia lost the game 😔👎";
+                // play lose audio
+                var loseAudio = new Audio(`${url}/static/audio/lose.mp3`);
+                loseAudio.play();
+              }
+
+              playerRoles.forEach((player) => {
+                const playerCard = createPlayerCard(
+                  player["name"],
+                  player["role"],
+                  player["alive"]
+                );
+                playersDiv.appendChild(playerCard);
+              });
+            } else {
+              let ResultsTxt = document.getElementById("results");
+              ResultsTxt.textContent = "Game is still ongoing 🕒";
+
+              let livePlayers = data["alive"];
+              let deadPlayers = data["dead"];
+
+              livePlayers.forEach((player) => {
+                const playerCard = createPlayerCard(player, "*****");
+                playersDiv.appendChild(playerCard);
+              });
+
+              deadPlayers.forEach((player) => {
+                const playerCard = createPlayerCard(player, "*****", false);
+                playersDiv.appendChild(playerCard);
+              });
+            }
+          });
+      }
+
+      if (gamecode) {
+        gameTxt = document.getElementById("gameid");
+        gameTxt.textContent = `Spectating game - ${gamecode}`;
+        fetchPlayers();
+        fetchPlayersInterval = setInterval(fetchPlayers, 3000); // Refresh players list every 3 seconds
+      }
+
+      function createPlayerCard(name, role, isAlive = true) {
+        var imageLink = "/static/images/civillian.png";
+        if (role == "mafia") {
+          imageLink = "/static/images/mafia.png";
+        } else if (role == "doctor") {
+          imageLink = "/static/images/doctor.png";
+        } else if (role == "police") {
+          imageLink = "/static/images/police.png";
+        } else if (role == "prankster") {
+          imageLink = "/static/images/prankster.png";
+        }
+
+        // Create elements
+        const card = document.createElement("div");
+        card.classList.add("player-card");
+
+        const playerInfo = document.createElement("div");
+        playerInfo.classList.add("player-info");
+
+        const playerImage = document.createElement("img");
+        playerImage.src = imageLink;
+        playerImage.alt = "Player Image";
+        playerImage.classList.add("player-image");
+
+        const playerDetails = document.createElement("div");
+        playerDetails.classList.add("player-details");
+
+        const playerName = document.createElement("h3");
+        if (!isAlive) {
+          const strike = document.createElement("strike");
+          strike.textContent = name;
+          playerName.appendChild(strike);
+        } else {
+          playerName.textContent = name;
+        }
+
+        const playerRole = document.createElement("h5");
+        playerRole.textContent = role;
+
+        // Append elements
+        playerDetails.appendChild(playerName);
+        playerDetails.appendChild(playerRole);
+
+        playerInfo.appendChild(playerImage);
+        playerInfo.appendChild(playerDetails);
+
+        card.appendChild(playerInfo);
+
+        return card;
+      }
+
+      function startGame() {
+        fetch(`${url}/reset_game/${gamecode}/${localHostCode}`, {
+          method: "GET",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Handle the response data
+            if ("error" in data) {
+              toast(data["error"], "#EA4335");
+            } else {
+              window.location.href = `${url}/play`;
+            }
+          })
+          .catch((error) => {
+            // Handle any errors
+            console.error(error);
+          });
+      }
+    </script>
+  </body>
+</html>

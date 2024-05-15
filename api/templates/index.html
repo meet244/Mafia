@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mafia Game</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #222;
+        color: #fff;
+      }
+
+      #container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #333;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      }
+
+      input,
+      button {
+        margin-bottom: 10px;
+        padding: 5px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        background-color: #444;
+        color: #fff;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #players {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>Mafia Game</h1>
+      <div id="joinOrCreateRoomDiv">
+        <label for="code">Room Code:</label>
+        <input
+          type="text"
+          id="code"
+          placeholder="Enter room code"
+          value="1234"
+        />
+        <label for="name">Your Name:</label>
+        <input
+          type="text"
+          id="name"
+          placeholder="Enter your name"
+          value="Meet"
+        />
+        <button onclick="joinOrCreateRoom()">Join/Create Room</button>
+      </div>
+      <div id="players"></div>
+      <div id="startGameDiv" style="display: none">
+        <button onclick="startGame()">Start Game</button>
+      </div>
+      <div id="roleCard" style="display: none">
+        <div id="roleName"></div>
+        <div id="roleDefinition"></div>
+      </div>
+    </div>
+    <script>
+      let url = "http://127.0.0.1:5000";
+      let ishost = false;
+      let hostcode = "";
+      let currState = "1";
+      let gamecode = "";
+      let playername = "";
+      let role = "";
+      let nextStateTime = 0;
+      let alivePlayers = [];
+      let deadPlayers = [];
+      let lastKilled = "";
+      let policeSusp = false;
+      let votedPlayer = "";
+      let wasVotedMafia = false;
+      let finalResults = false;
+      let mafiaWon = null;
+      let playerRoles = {};
+
+      function joinOrCreateRoom() {
+        var code = document.getElementById("code").value;
+        var name = document.getElementById("name").value;
+        if (code == "") {
+          code = "null";
+        }
+        fetch(`${url}/room/${code}/${name}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("error" in data) {
+              // show error message
+              toast(data["error"], "red");
+              return;
+            }
+
+            hostcode = data["host_code"];
+            playername = name;
+
+            if (data["status"].includes("created")) {
+              // You are the host, show all player names
+              ishost = true;
+              gamecode = data["code"];
+              toast("New Room Created", "#0F9D58");
+              showPlayers();
+              // Show the "Start Game" button
+              document.getElementById("startGameDiv").style.display = "block";
+            } else if (data["status"].includes("joined")) {
+              // You are not the host, show "waiting for host to start" message
+              gamecode = code;
+              toast("Room Joined", "#4285F4");
+              showWaitingMessage();
+            }
+            // Hide the input fields and the "Join/Create Room" button
+            var inputDiv = document.getElementById("joinOrCreateRoomDiv");
+            inputDiv.style.display = "none";
+          });
+      }
+
+      function toast(message, color, duration = 2000) {
+        var toast = document.createElement("div");
+        toast.textContent = message;
+        toast.style.position = "fixed";
+        toast.style.top = "5%";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.backgroundColor = color;
+        toast.style.color = "#fff";
+        toast.style.padding = "10px";
+        toast.style.borderRadius = "5px";
+        toast.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.5)";
+        toast.style.zIndex = "9999";
+        document.body.appendChild(toast);
+        setTimeout(function () {
+          toast.remove();
+        }, duration);
+      }
+
+      function showWaitingMessage(message = "Waiting for host to start...") {
+        var playersDiv = document.getElementById("players");
+        playersDiv.innerHTML = "";
+        var p = document.createElement("p");
+        p.textContent = message;
+        playersDiv.appendChild(p);
+        pollState();
+      }
+
+      function pollState() {
+        var intervalId = setInterval(() => {
+          fetch(`${url}/state_poll/${gamecode}/${currState}/${playername}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data["status"] == "wait") {
+                // show waiting message and update players list from data["players"]
+                var playersDiv = document.getElementById("players");
+                playersDiv.innerHTML = "";
+                var p = document.createElement("p");
+                if (currState == "1") {
+                  p.textContent = "Waiting for host to start the game...";
+                } else if (currState == "2") {
+                  p.textContent = "Waiting for other players to See...";
+                } else if (currState == "3") {
+                  p.textContent = "Waiting for other players to choose...";
+                } else if (currState == "4") {
+                  p.textContent =
+                    "Waiting for other players to complete voting...";
+                }
+
+                playersDiv.appendChild(p);
+
+                if (data.hasOwnProperty("players")) {
+                  // add text "Players:"
+                  var p = document.createElement("p");
+                  p.textContent = "Players:";
+                  playersDiv.appendChild(p);
+
+                  data["players"].forEach((player) => {
+                    var p = document.createElement("p");
+                    p.textContent = player;
+                    playersDiv.appendChild(p);
+                  });
+                } else if (data.hasOwnProperty("waiting_players")) {
+                  // add text "Not ready players:"
+                  var p = document.createElement("p");
+                  p.textContent = "Not ready players:";
+
+                  data["waiting_players"].forEach((player) => {
+                    var p = document.createElement("p");
+                    p.textContent = player;
+                    playersDiv.appendChild(p);
+                  });
+                }
+              } else if (data["status"] == "update") {
+                // clear the players list and everything else
+                var playersDiv = document.getElementById("players");
+                playersDiv.innerHTML = "";
+                clearInterval(intervalId); // Exit the loop
+
+                if (currState == "1") {
+                  // show message "You are getting your role...Shh!🤫 Keep it secret"
+                  var p = document.createElement("p");
+                  p.textContent =
+                    "You are getting your role...Shh!🤫 Keep it secret";
+                  playersDiv.appendChild(p);
+
+                  role = data["role"];
+                  nextStateTime = parseInt(data["next_state_time"]);
+                } else if (currState == "2") {
+                  // show message "It's time to choose someone.. Be careful!👀"
+                  var p = document.createElement("p");
+                  p.textContent = "It's time to choose someone.. Be careful!👀";
+                  playersDiv.appendChild(p);
+
+                  nextStateTime = parseInt(data["next_state_time"]);
+                  alivePlayers = data["alive"];
+                  deadPlayers = data["dead"];
+                } else if (currState == "3") {
+                  // show message "Curious to know what happened last night??🤔"
+                  var p = document.createElement("p");
+                  p.textContent =
+                    "Curious to know what happened last night??🤔";
+                  playersDiv.appendChild(p);
+
+                  nextStateTime = parseInt(data["next_state_time"]);
+                  lastKilled = data["last_killed"];
+                  policeSusp = data["police_susp"];
+                  alivePlayers = data["alive"];
+                  deadPlayers = data["dead"];
+                  mafiaWon = data["mafia_won"];
+                  finalResults = data["final_results"];
+                  if (finalResults == true) {
+                    playerRoles = data["player_roles"];
+                  }
+                } else if (currState == "4") {
+                  // show message "Voting Results are out... Let's see who is eliminated"
+                  var p = document.createElement("p");
+                  p.textContent = "Voting Results are out... Let's see them!👀";
+                  playersDiv.appendChild(p);
+
+                  nextStateTime = parseInt(data["next_state_time"]);
+                  votedPlayer = data["voted_out"];
+                  wasVotedMafia = data["was_voted_mafia"];
+                  mafiaWon = data["mafia_won"];
+                  finalResults = data["final_results"];
+                  if (finalResults == true) {
+                    playerRoles = data["player_roles"];
+                  }
+                }
+                updateState();
+              }
+            });
+        }, 3000);
+      }
+
+      function updateState() {
+        if (currState == "1") {
+          currState = "2";
+          console.log("State 1 to 2");
+          console.log("Role: ", role);
+          // show role on time(nextStateTime)
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              // clear the players list and everything else
+              var playersDiv = document.getElementById("players");
+              playersDiv.innerHTML = "";
+
+              showRoleCard();
+              toast(`Your role is ${role}`, "#0F9D58");
+            }, timeDiff);
+          }
+        } else if (currState == "2") {
+          currState = "3";
+          console.log("State 2 to 3");
+          console.log("Alive players: ", alivePlayers);
+          console.log("Dead players: ", deadPlayers);
+
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              // clear the players list and everything else
+              var playersDiv = document.getElementById("players");
+              playersDiv.innerHTML = "";
+
+              // show the title as per role
+              var p = document.createElement("p");
+              if (role == "mafia") {
+                p.textContent = "Choose someone to kill";
+              } else if (role == "doctor") {
+                p.textContent = "Choose someone to save";
+              } else if (role == "police") {
+                p.textContent = "Choose someone to investigate";
+              } else if (role == "prankster") {
+                p.textContent = "Choose someone to prank";
+              } else {
+                p.textContent = [
+                  "Choose anyone.. No need to think",
+                  "Choose someone it doesn't matter",
+                ][Math.floor(Math.random() * 2)];
+              }
+              playersDiv.appendChild(p);
+
+              // show the list of alive players as radio buttons and add a submit button
+              alivePlayers.forEach((player) => {
+                if (player !== playername) {
+                  var radio = document.createElement("input");
+                  radio.type = "radio";
+                  radio.name = "player";
+                  radio.value = player;
+                  var label = document.createElement("label");
+                  label.textContent = player;
+                  playersDiv.appendChild(radio);
+                  playersDiv.appendChild(label);
+                  var br = document.createElement("br");
+                  playersDiv.appendChild(br);
+                }
+              });
+
+              var submit = document.createElement("button");
+              submit.textContent = "Submit";
+              // call a function to submit the choice
+              submit.onclick = selected_target;
+              playersDiv.appendChild(submit);
+            }, timeDiff);
+          }
+        } else if (currState == "3") {
+          currState = "4";
+          console.log("State 3 to 4");
+          console.log("Last killed: ", lastKilled);
+          console.log("Police suspicion: ", policeSusp);
+
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              // clear the players list and everything else
+              var playersDiv = document.getElementById("players");
+              playersDiv.innerHTML = "";
+
+              // show last night details
+              (async function () {
+                await showLastNightDetails();
+                if (finalResults) {
+                  showFinalResults();
+                  return;
+                }
+                await showDiscussionRound();
+                await showVotingRound();
+              })();
+            }, timeDiff);
+          }
+        } else if (currState == "4") {
+          currState = "2";
+          console.log("State 4 to 2");
+          console.log("Alive players: ", alivePlayers);
+          console.log("Dead players: ", deadPlayers);
+
+          var currentTime = Math.floor(Date.now());
+          var timeDiff = nextStateTime - currentTime;
+
+          console.log("Next state time: ", nextStateTime);
+          console.log("Current time: ", currentTime);
+          console.log("Time diff: ", timeDiff);
+
+          if (timeDiff > 0) {
+            setTimeout(() => {
+              // clear the players list and everything else
+              var playersDiv = document.getElementById("players");
+              playersDiv.innerHTML = "";
+
+              // Voting results are out
+              (async function () {
+                await show_votingResults();
+                if (finalResults) {
+                  showFinalResults();
+                  return;
+                } else {
+                  // next round
+                  await itsNightNow();
+
+                  // show next btn
+                  var nextBtn = document.createElement("button");
+                  nextBtn.textContent = "Next Round";
+                  nextBtn.onclick = () => {
+                    // remove the button
+                    nextBtn.remove();
+                    // clear the players list and everything else
+                    var playersDiv = document.getElementById("players");
+                    playersDiv.innerHTML = "";
+
+                    seenMyRole();
+                  };
+                  playersDiv.appendChild(nextBtn);
+                }
+              })();
+            }, timeDiff);
+          }
+        }
+      }
+
+      function showFinalResults() {
+        // show to final results
+        var playersDiv = document.getElementById("players");
+        var p = document.createElement("h2");
+        if (mafiaWon) {
+          p.textContent = "Mafia Won!";
+        } else {
+          p.textContent = "Mafia Lost!";
+        }
+        playersDiv.appendChild(p);
+
+        var p = document.createElement("p");
+        p.textContent = "Game Over!";
+        playersDiv.appendChild(p);
+
+        // show all players and their roles
+        var p = document.createElement("p");
+        p.textContent = "Players and their roles:";
+        playersDiv.appendChild(p);
+
+        Object.keys(playerRoles).forEach((player) => {
+          var p = document.createElement("p");
+          if (playerRoles[player].alive) {
+            p.textContent = `${playerRoles[player].name} - ${playerRoles[player].role}`;
+          } else {
+            p.innerHTML = `<strike>$${playerRoles[player].name} - ${playerRoles[player].role}</strike>`;
+          }
+          playersDiv.appendChild(p);
+        });
+
+        var p = document.createElement("p");
+        p.textContent = "Thank you for playing!";
+        playersDiv.appendChild(p);
+
+        // if host, show the "Play Mafia Again" button
+
+        var playAgain = document.createElement("button");
+        playAgain.textContent = "Play Mafia Again";
+        playAgain.onclick = () => {
+          console.log("Play again clicked");
+        };
+        playersDiv.appendChild(playAgain);
+      }
+
+      async function itsNightNow() {
+        // clear the players list and everything else
+        var playersDiv = document.getElementById("players");
+        playersDiv.innerHTML = "";
+
+        // show frightening message
+        var p = document.createElement("p");
+        p.textContent = [
+          "It's Night now... Close your eyes",
+          "The night is alive with danger. Close your eyes and stay aware.",
+          "The night is dark and full of terrors. Be careful.",
+        ][Math.floor(Math.random() * 3)];
+        playersDiv.appendChild(p);
+
+        var p = document.createElement("p");
+        p.textContent = "We'll continue in 5 seconds";
+        playersDiv.appendChild(p);
+
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // wait 10 seconds
+        // clean
+        playersDiv.innerHTML = "";
+      }
+      async function show_votingResults() {
+        // clear the players list and everything else
+        var playersDiv = document.getElementById("players");
+        playersDiv.innerHTML = "";
+
+        // Voting results are out
+        var p = document.createElement("p");
+        p.textContent = "Voting Results";
+        playersDiv.appendChild(p);
+
+        var p = document.createElement("h4");
+        let nxtcontent = "";
+        if (wasVotedMafia) {
+          nxtcontent = `${votedPlayer} was the Mafia`;
+        } else {
+          nxtcontent = `${votedPlayer} was not the Mafia`;
+        }
+        p.textContent = `${votedPlayer} was voted out...\n${nxtcontent}`;
+        playersDiv.appendChild(p);
+
+        var p = document.createElement("p");
+        p.textContent = "Continue in 10 seconds";
+        playersDiv.appendChild(p);
+
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 10 seconds
+        // clean
+        playersDiv.innerHTML = "";
+      }
+      async function showLastNightDetails() {
+        // clear the players list and everything else
+        var playersDiv = document.getElementById("players");
+        playersDiv.innerHTML = "";
+
+        // show last night details
+        var p = document.createElement("p");
+        p.textContent = "Last night details - ";
+        playersDiv.appendChild(p);
+
+        var p = document.createElement("h4");
+        if (lastKilled == playername) {
+          p.textContent = "You were killed last night";
+        } else {
+          p.textContent = `Last night ${lastKilled} was killed`;
+        }
+        playersDiv.appendChild(p);
+
+        var p = document.createElement("h4");
+        if (policeSusp) {
+          p.textContent = `Police suspicion was Correct`;
+        } else {
+          p.textContent = `Police suspicion was Wrong`;
+        }
+        playersDiv.appendChild(p);
+
+        var p = document.createElement("p");
+        p.textContent = "Continue in 10 seconds";
+        playersDiv.appendChild(p);
+
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 5 seconds
+        // clean
+        playersDiv.innerHTML = "";
+      }
+      async function showDiscussionRound() {
+        // clear the players list and everything else
+        var playersDiv = document.getElementById("players");
+        playersDiv.innerHTML = "";
+
+        // show 10 sec countdown for discussion round
+        var p = document.createElement("p");
+        p.textContent = `Discussion round will end in 10 seconds`;
+        playersDiv.appendChild(p);
+
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 10 seconds
+        // clean
+        playersDiv.innerHTML = "";
+      }
+      async function showVotingRound() {
+        // voting round
+        var playersDiv = document.getElementById("players");
+        var p = document.createElement("p");
+        p.textContent = "Vote to eliminate a player";
+        playersDiv.appendChild(p);
+
+        // show the list of alive players as radio buttons(along with skip option) and add a submit button
+        alivePlayers.forEach((player) => {
+          if (player !== playername) {
+            var radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "player";
+            radio.value = player;
+            var label = document.createElement("label");
+            label.textContent = player;
+            playersDiv.appendChild(radio);
+            playersDiv.appendChild(label);
+            var br = document.createElement("br");
+            playersDiv.appendChild(br);
+          }
+        });
+        // add skip option
+        var radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "player";
+        radio.value = "skip";
+        var label = document.createElement("label");
+        label.textContent = "Skip";
+        playersDiv.appendChild(radio);
+        playersDiv.appendChild(label);
+        var br = document.createElement("br");
+        playersDiv.appendChild(br);
+
+        var submit = document.createElement("button");
+        submit.textContent = "Submit Vote";
+        // call a function to submit the choice
+        submit.onclick = selected_vote;
+        playersDiv.appendChild(submit);
+      }
+
+      function selected_vote() {
+        var vote = document.querySelector('input[name="player"]:checked').value;
+        console.log("Selected vote: ", vote);
+        fetch(`${url}/selected_vote/${gamecode}/${playername}/${vote}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("error" in data) {
+              // show error message
+              toast(data["error"], "red");
+              return;
+            }
+            toast(data["status"], "#0F9D58");
+            // show waiting message
+            showWaitingMessage(
+              "Waiting for other players to complete voting..."
+            );
+          });
+      }
+
+      function selected_target() {
+        var target = document.querySelector(
+          'input[name="player"]:checked'
+        ).value;
+        console.log("Selected target: ", target);
+        fetch(`${url}/selected_target/${gamecode}/${playername}/${target}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("error" in data) {
+              // show error message
+              toast(data["error"], "red");
+              return;
+            }
+            toast(data["status"], "#0F9D58");
+            // show waiting message
+            showWaitingMessage("Waiting for other players to choose...");
+          });
+      }
+
+      function showRoleCard() {
+        // Define roles and their meanings
+        const roleDefinitions = {
+          mafia:
+            "The Mafia's goal is to kill off all the townspeople without getting caught.",
+          doctor:
+            "The Doctor can choose to heal one person per night, preventing them from being killed by the Mafia.",
+          police:
+            "The Police can investigate one person per night to determine if they are a member of the Mafia.",
+          prankster:
+            "The Prankster can choose to prank one person per night, preventing them from performing their role.",
+          civilian:
+            "The Civilians' goal is to figure out who the Mafia members are and vote to eliminate them.",
+        };
+
+        // Get the role card elements
+        const roleCard = document.getElementById("roleCard");
+        const roleNameElement = document.getElementById("roleName");
+        const roleDefinitionElement = document.getElementById("roleDefinition");
+
+        // Apply some dark styling
+        roleCard.style.display = "block";
+        roleCard.style.backgroundColor = "#333";
+        roleCard.style.border = "1px solid #444";
+        roleCard.style.borderRadius = "5px";
+        roleCard.style.padding = "10px";
+        roleCard.style.margin = "10px";
+
+        roleNameElement.style.fontWeight = "bold";
+        roleNameElement.style.marginBottom = "5px";
+
+        roleDefinitionElement.style.marginTop = "5px";
+
+        // Display role name and definition
+        roleNameElement.textContent = role;
+        roleDefinitionElement.textContent = roleDefinitions[role];
+
+        // Hide the role card after 5 seconds and call the 'doneMyRole' function
+        roleCard.addEventListener("click", () => {
+          roleCard.style.display = "none";
+          seenMyRole(); // Call API to indicate that the player has seen their role
+        });
+      }
+
+      function seenMyRole() {
+        // Call API to indicate that the player has seen their role
+        fetch(`${url}/update_state/${gamecode}/${playername}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data["status"] == "done") {
+              // Now wait for other players to see their roles and
+              console.log("Player role update complete");
+              pollState();
+            }
+          });
+      }
+
+      function startGame() {
+        fetch(`${url}/start_game/${gamecode}/${hostcode}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("error" in data) {
+              // show error message
+              toast(data["error"], "red");
+              return;
+            }
+            toast(data["status"], "#0F9D58");
+            // hide the "Start Game" button
+            document.getElementById("startGameDiv").style.display = "none";
+            // show waiting message
+            showWaitingMessage("Game is about to start...");
+          });
+      }
+
+      var shownPlayers = false;
+      function showPlayers() {
+        if (shownPlayers) {
+          return;
+        }
+        shownPlayers = true;
+        var intervalId;
+        function fetchPlayers() {
+          fetch(`${url}/players/${gamecode}`)
+            .then((response) => response.json())
+            .then((data) => {
+              var playersDiv = document.getElementById("players");
+              playersDiv.innerHTML = "";
+              data.forEach((player) => {
+                var p = document.createElement("p");
+                p.textContent = player;
+                playersDiv.appendChild(p);
+              });
+            });
+        }
+        intervalId = setInterval(fetchPlayers, 3000);
+
+        function stopFetchingPlayers() {
+          clearInterval(intervalId);
+        }
+
+        // Stop fetching players on start game
+        document
+          .getElementById("startGameDiv")
+          .addEventListener("click", stopFetchingPlayers);
+      }
+    </script>
+  </body>
+</html>

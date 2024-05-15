@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *{
+        font-family: 'Poetsen One', sans-serif;
+        font-weight: 100;
+        font-style: normal;
+      }
+
+      h1 {
+
+        font-size: 3em;
+        color: #ffffff;
+        text-align: center;
+        margin: 20px 0;
+        margin-bottom: 0px;
+      }
+
+      body::-webkit-scrollbar {
+        display: none; /* Hide the scrollbar */
+      }
+
+      .container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 500px; /* Maximum width for container */
+        height: calc(90vh - 70px); /* Subtract the height of the title (70px) */
+        margin: 10px;
+        background: #000000d0;
+        padding: 20px;
+        border-radius: 1rem;
+        overflow: auto;
+        display: grid;
+        place-items: center;
+      }
+
+      button {
+        background: #4285f4;
+        font-family: "Poetsen One", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        padding: 0.6em 1.3em;
+        font-size: 18px;
+        border: 3px solid #000000;
+        border-radius: 0.4em;
+        box-shadow: 0.15em 0.15em #ffffff;
+        cursor: pointer;
+        color: #ffffff;
+      }
+
+      button:hover {
+        transform: translate(-0.05em, -0.05em);
+        box-shadow: 0.2em 0.2em #ffffff;
+      }
+
+      button:active {
+        transform: translate(0.05em, 0.05em);
+        box-shadow: 0.05em 0.05em #ffffff;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        --color: rgba(114, 114, 114, 0.3);
+        background-color: #1d1d1d;
+        background-image: linear-gradient(
+            0deg,
+            transparent 24%,
+            var(--color) 25%,
+            var(--color) 26%,
+            transparent 27%,
+            transparent 74%,
+            var(--color) 75%,
+            var(--color) 76%,
+            transparent 77%,
+            transparent
+          ),
+          linear-gradient(
+            90deg,
+            transparent 24%,
+            var(--color) 25%,
+            var(--color) 26%,
+            transparent 27%,
+            transparent 74%,
+            var(--color) 75%,
+            var(--color) 76%,
+            transparent 77%,
+            transparent
+          );
+        background-size: 55px 55px;
+      }
+
+      @media screen and (max-width: 768px) {
+        /* Adjust styles for smaller screens */
+        .container {
+          width: 80%;
+          max-width: 100%;
+          margin: 5px;
+        }
+      }
+    </style>
+    <style>
+      .flip-card {
+        background-color: transparent;
+        width: 190px;
+        height: 254px;
+        perspective: 1000px;
+        font-family: sans-serif;
+      }
+
+      .title {
+        font-size: 1.5em;
+        text-align: center;
+        margin: 0;
+      }
+
+      .flip-card:hover {
+        cursor: pointer;
+      }
+
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+      }
+
+      .flip-card-front,
+      .flip-card-back {
+
+        box-shadow: 0 8px 14px 0 rgba(255, 255, 0, 0.2);
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border: 3px solid #ffffff;
+        border-radius: 1rem;
+      }
+
+      .flip-card-front {
+        background: #4285f4;
+        color: white;
+        border: 3px solid #d4e5ff;
+        box-shadow: 0 8px 14px 0 rgba(66, 133, 244, 0.2);
+      }
+
+      .flip-card-back {
+        background: linear-gradient(
+          120deg,
+          gold 30%,
+          goldenrod 88%,
+          bisque 40%,
+          goldenrod 78%
+        );
+        color: #1d1d1d;
+        transform: rotateY(180deg);
+      }
+    </style>
+    <style>
+      .label {
+        display: flex;
+        align-items: center;
+        border-radius: 100px;
+        padding: 14px 16px;
+        margin: 5px 0;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .label:hover,
+      .label:focus-within,
+      .label:active {
+        background: hsla(0, 0%, 80%, 0.14);
+      }
+
+      .radio-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        z-index: -1;
+      }
+
+      .radio-design {
+        width: 22px;
+        height: 22px;
+        border-radius: 100px;
+        background: #4285f4;
+        position: relative;
+      }
+
+      .radio-design::before {
+        content: "";
+        display: inline-block;
+        width: inherit;
+        height: inherit;
+        border-radius: inherit;
+        background: hsl(0, 0%, 90%);
+        transform: scale(1.1);
+        transition: 0.3s;
+      }
+
+      .radio-input:checked + .radio-design::before {
+        transform: scale(0);
+      }
+
+      .label-text {
+        color: hsl(0, 0%, 60%);
+        margin-left: 14px;
+        letter-spacing: 3px;
+
+        transition: 0.3s;
+      }
+
+      .radio-input:checked ~ .label-text {
+        color: hsl(0, 0%, 100%);
+      }
+    </style>
+    <style>
+      .input {
+        --input-focus: #ffffff;
+        --font-color: #ffffff;
+        --font-color-sub: #ffffff;
+        --bg-color: #3b3b3b;
+        --main-color: #4285f4;
+        width: 200px;
+        height: 40px;
+        border-radius: 5px;
+        border: 2px solid var(--main-color);
+        background-color: var(--bg-color);
+        box-shadow: 4px 4px var(--main-color);
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--font-color);
+        padding: 5px 10px;
+        outline: none;
+      }
+
+      .input::placeholder {
+        color: var(--font-color-sub);
+        opacity: 0.8;
+      }
+
+      .input:focus {
+        border: 2px solid var(--input-focus);
+      }
+    </style>
+    <style>
+      /* The switch - the box around the slider */
+      .switch {
+        font-size: 17px;
+        position: relative;
+        display: inline-block;
+        width: 3.5em;
+        height: 2em;
+      }
+
+      /* Hide default HTML checkbox */
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      /* The slider */
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #db4437;
+        transition: 0.4s;
+        border-radius: 10px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 1.4em;
+        width: 1.4em;
+        border-radius: 8px;
+        left: 0.3em;
+        bottom: 0.3em;
+        transform: rotate(270deg);
+        background-color: rgb(255, 255, 255);
+        transition: 0.4s;
+      }
+
+      .switch input:checked + .slider {
+        background-color: #4285f4;
+      }
+
+      .switch input:checked + .slider:before {
+        transform: translateX(1.5em);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>MAFIA</h1>
+    <div class="container">
+      <br />
+      <button onclick="playSound()">Play Game</button>
+
+      <br />
+
+      <div class="radio-input-wrapper">
+        <label class="label">
+          <input
+            value="value-2"
+            name="value-radio"
+            id="value-2"
+            class="radio-input"
+            type="radio"
+          />
+          <div class="radio-design"></div>
+          <div class="label-text">Player 1</div>
+        </label>
+        <label class="label">
+          <input
+            value="value-3"
+            name="value-radio"
+            id="value-3"
+            class="radio-input"
+            type="radio"
+          />
+          <div class="radio-design"></div>
+          <div class="label-text">Player 2</div>
+        </label>
+        <label class="label">
+          <input
+            value="value-4"
+            name="value-radio"
+            id="value-4"
+            class="radio-input"
+            type="radio"
+          />
+          <div class="radio-design"></div>
+          <div class="label-text">Player 3</div>
+        </label>
+      </div>
+
+      <br />
+
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <p class="title">Role Card</p>
+            <p>Click Me</p>
+          </div>
+          <div class="flip-card-back">
+            <p>Your Role</p>
+            <p class="title">MAFIA</p>
+            <p>
+              You have to secretly kill the good guys while pretending to be one
+              of them, so you can win.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <br />
+      <br />
+
+      <input placeholder="Name" name="text" class="input" />
+
+      <br />
+      <br />
+
+      <label class="switch">
+        <input type="checkbox" checked />
+        <span class="slider"></span>
+      </label>
+      <label class="switch">
+        <input type="checkbox" checked />
+        <span class="slider"></span>
+      </label>
+      <label class="switch">
+        <input type="checkbox" checked />
+        <span class="slider"></span>
+      </label>
+      <label class="switch">
+        <input type="checkbox" checked />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <script>
+      var clickAudio = new Audio("http://127.0.0.1:5000/static/click.mp3");
+      var selectAudio = new Audio("http://127.0.0.1:5000/static/select.mp3");
+
+      function playSound() {
+        clickAudio.play();
+      }
+
+      const flipCard = document.querySelector(".flip-card");
+      flipCard.addEventListener("click", function () {
+        clickAudio.play();
+        const flipCardInner = this.querySelector(".flip-card-inner");
+        if (flipCardInner.style.transform === "rotateY(180deg)") {
+          flipCardInner.style.transform = "rotateY(0deg)";
+        } else {
+          flipCardInner.style.transform = "rotateY(180deg)";
+        }
+      });
+
+      var input = document.querySelector(".input");
+      input.addEventListener("focus", function () {
+        clickAudio.play();
+      });
+
+      var radioInputs = document.querySelectorAll(".radio-input");
+      radioInputs.forEach(function (radioInput) {
+        radioInput.addEventListener("click", function () {
+          selectAudio.play();
+        });
+      });
+
+        var switchInput = document.querySelector(".switch input");
+        switchInput.addEventListener("click", function () {
+          selectAudio.play();
+        });
+    </script>
+  </body>
+</html>

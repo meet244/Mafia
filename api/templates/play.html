@@ -793,8 +793,6 @@
       async function showLastNightDetails() {
         headLine.textContent = "Last Night";
         // clear the players list and everything else
-        if (lastKilled == playername) {
-        }
         var iAmDead = false;
         if (lastKilled == playername) {
           // play got_killed sound
@@ -823,12 +821,11 @@
           }
 
           btmMessage.textContent = "We'll Continue in 10 seconds";
-
-          await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 5 seconds
-          if (iAmDead) {
-            window.removeEventListener("beforeunload", confirmExit);
-            window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
-          }
+        }
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 5 seconds
+        if (iAmDead) {
+          window.removeEventListener("beforeunload", confirmExit);
+          window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
         }
       }
       async function showDiscussionRound() {

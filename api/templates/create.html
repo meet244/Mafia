@@ -271,6 +271,7 @@
           width: 80%;
           max-width: 100%;
           margin: 5px;
+          height: calc(82vh - 70px);
         }
         .input {
           width: 85%;
@@ -523,7 +524,6 @@
             localStorage.setItem("gameCode", gamecode);
             localStorage.setItem("hostCode", hostCode);
             localStorage.setItem("playerName", playerName);
-            
 
             // redirect to game page
             window.location.href = `${url}/play`;

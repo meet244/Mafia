@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect
 # from flask_cors import CORS
 import pymongo
 import random
@@ -20,7 +20,11 @@ app = Flask(__name__, static_folder='static')
 
 @app.route('/')
 def index():
-    return render_template('main.html')
+    return render_template('landing.html')
+
+@app.route('/ui', methods=['GET'])
+def ui():
+    return render_template('ui.html')
 
 @app.route('/spectate', methods=['GET'])
 def spectate():
@@ -330,7 +334,7 @@ def update_state_complete(code, name):
         # update state after everyone has completed choosing
         if doc['game_state'] == '2':
             doc['game_state'] = '3'
-            # make all players state complete false
+            # make all players state complete False
             for p in doc['players']:
                 p['current_state_complete'] = False
             # calc next state time and update
@@ -340,7 +344,7 @@ def update_state_complete(code, name):
             return jsonify({"status":"done"})
         if doc['game_state'] == '3':
             doc['game_state'] = '4'
-            # make all players state complete false
+            # make all players state complete False
             for p in doc['players']:
                 p['current_state_complete'] = False
 
@@ -386,7 +390,7 @@ def update_state_complete(code, name):
             elif mafia_count >= villager_count:
                 doc['mafia_won'] = True
 
-            # make all players state complete false
+            # make all players state complete False
             for p in doc['players']:
                 p['is_killed'] = False
                 p['is_saved'] = False
@@ -402,7 +406,7 @@ def update_state_complete(code, name):
         elif doc['game_state'] == '4':
             # update game_state and next_state_time when everyone has completed voting
             doc['game_state'] = '2'
-            # make all players state complete false
+            # make all players state complete False
             for p in doc['players']:
                 p['current_state_complete'] = False
             
@@ -438,7 +442,7 @@ def update_state_complete(code, name):
                         break
             else:
                 doc['voted_out'] = 'No one'
-            # make all players state complete false
+            # make all players state complete False
             for p in doc['players']:
                 p['vote_out_count'] = 0
 

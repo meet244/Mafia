@@ -3,19 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>MAFIA - Can you survive tonight?</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" href="/static/images/logo.ico" />
 
     <style>
       * {
         font-family: "Poetsen One", sans-serif;
         font-weight: 100;
         font-style: normal;
+      }
+
+      img {
+        animation: floating 3s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translateY(5px);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+        100% {
+          transform: translateY(5px);
+        }
+      }
+
+      a {
+        text-decoration: none;
+        color: #ffffff;
       }
 
       h1 {
@@ -157,12 +179,24 @@
     </style>
   </head>
   <body>
-    <h1>MAFIA</h1>
+    <a href="/" style="cursor: pointer"
+      ><div style="display: flex; align-items: center">
+        <img
+          src="/static/images/logo.svg"
+          alt="Image"
+          style="width: 75px; height: 75px; margin-right: 25px"
+        />
+        <h1>MAFIA</h1>
+      </div>
+    </a>
     <div class="container">
-      <h2>I would love to <strike>Choose</strike> <span style="color: #EA4335;">KILL</span> You</h2>
+      <h2>
+        I would love to <strike>Choose</strike>
+        <span style="color: #ea4335">KILL</span> You
+      </h2>
       <br />
-      <img src="/static/images/logo.svg" alt="Logo" style="margin: 60px 0px;" />
-      <br/>
+      <img src="/static/images/logo.svg" alt="Logo" style="margin: 60px 0px" />
+      <br />
       <h4>Comming Soon...</h4>
     </div>
     <script>

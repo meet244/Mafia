@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+		<link rel="icon" type="image/png" href="/static/images/logo.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -33,6 +34,11 @@
         margin: 0px 0;
       }
 
+      a {
+        text-decoration: none;
+        color: #ffffff;
+      }
+
       body::-webkit-scrollbar {
         display: none; /* Hide the scrollbar */
       }
@@ -44,7 +50,7 @@
       .container {
         width: 90%;
         max-width: 500px; /* Maximum width for container */
-        height: calc(90vh - 70px); /* Subtract the height of the title (70px) */
+        height: calc(82vh - 70px); /* Subtract the height of the title (70px) */
         margin: 10px;
         background: #000000d0;
         padding: 20px;
@@ -167,7 +173,16 @@
     </style>
   </head>
   <body>
-    <h1>MAFIA</h1>
+    <a href="/" style="cursor: pointer"
+      ><div style="display: flex; align-items: center">
+        <img
+          src="/static/images/logo.svg"
+          alt="Image"
+          style="width: 75px; height: 75px; margin-right: 25px"
+        />
+        <h1>MAFIA</h1>
+      </div>
+    </a>
     <div class="container">
       <h2>Join Game</h2>
       <br />
@@ -188,6 +203,20 @@
       <button style="background: #fbbc05; color: #000000" onclick="create()">
         Create new Room
       </button>
+    </div>
+    <div
+      style="
+        position: absolute;
+        bottom: 25px;
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+      "
+    >
+      <span style="color: #ffffff"
+        >Made with 💖 by 
+        <a href="www.github.com/meet244" target="_blank">Meet Patel</a></span
+      >
     </div>
     <script>
       //   read parameters from URL

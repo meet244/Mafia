@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+		<link rel="icon" type="image/png" href="/static/images/logo.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -19,6 +20,11 @@
         font-family: "Poetsen One", sans-serif;
         font-weight: 100;
         font-style: normal;
+      }
+
+      a {
+        text-decoration: none;
+        color: #ffffff;
       }
 
       h1 {
@@ -47,7 +53,7 @@
       .container {
         width: 90%;
         max-width: 500px;
-        height: calc(90vh - 70px);
+        height: calc(82vh - 70px);
         margin: 10px;
         background: #000000d0;
         padding: 20px;
@@ -326,8 +332,16 @@
     </style>
   </head>
   <body>
-    <!-- <div id="container2"> -->
-    <h1>MAFIA</h1>
+      <a href="/" style="cursor: pointer"
+      ><div style="display: flex; align-items: center">
+        <img
+          src="/static/images/logo.svg"
+          alt="Image"
+          style="width: 75px; height: 75px; margin-right: 25px"
+        />
+        <h1>MAFIA</h1>
+      </div>
+    </a>
     <div class="container" id="main-container">
       <br />
       <h2 id="headLine">Waiting Room</h2>
@@ -419,6 +433,20 @@
       </button>
       <br />
       <h5 id="btmMessage"></h5>
+    </div>
+    <div
+      style="
+        position: absolute;
+        bottom: 25px;
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+      "
+    >
+      <span style="color: #ffffff"
+        >Made with 💖 by
+        <a href="www.github.com/meet244" target="_blank"> Meet Patel</a></span
+      >
     </div>
 
     <script>

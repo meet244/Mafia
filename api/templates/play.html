@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-		<link rel="icon" type="image/png" href="/static/images/logo.ico" />
+    <link rel="icon" type="image/png" href="/static/images/logo.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -133,6 +133,11 @@
 
       .player-details > h5 {
         text-align: left;
+      }
+
+      .player-remove {
+        background-color: #ea4335;
+        margin-top: -3px;
       }
 
       h3 {
@@ -328,11 +333,14 @@
         button {
           width: 95%;
         }
+        .player-remove {
+          width: 18%;
+        }
       }
     </style>
   </head>
   <body>
-      <a href="/" style="cursor: pointer"
+    <a href="/" style="cursor: pointer"
       ><div style="display: flex; align-items: center">
         <img
           src="/static/images/logo.svg"
@@ -444,8 +452,7 @@
       "
     >
       <span style="color: #ffffff"
-        >Made with 💖 by
-        <a href="www.github.com/meet244" target="_blank"> Meet Patel</a></span
+        >Made with 💖 by <a href="/meet" target="_blank"> Meet Patel</a></span
       >
     </div>
 
@@ -479,6 +486,7 @@
       var gotKilledAudio = new Audio(`${url}/static/audio/got_killed.mp3`);
       var night_horrorAudio = new Audio(`${url}/static/audio/night_horror.mp3`);
       var suspenseAudio = new Audio(`${url}/static/audio/suspense.mp3`);
+      var shhAudio = new Audio(`${url}/static/audio/shh.mp3`);
 
       // create variables for elements
       var headLine = document.getElementById("headLine");
@@ -562,6 +570,12 @@
                 // show waiting message and update players list from data["players"]
                 if (currState == "1") {
                   mess.textContent = "Waiting for host to start the game...";
+                  if (data.hasOwnProperty("players")) {
+                    if (!data["players"].includes(playername)) {
+                      window.removeEventListener("beforeunload", confirmExit);
+                      window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+                    }
+                  }
                 } else if (currState == "2") {
                   mess.textContent = "Waiting for following players...";
                 } else if (currState == "3") {
@@ -584,9 +598,18 @@
                 }
               } else if (data["status"] == "update") {
                 clearInterval(intervalId);
-                // clear the players list and everything else
+
+                if (data["prev_state"] != currState) {
+                  // update the current state
+                  currState = data["prev_state"];
+                  console.log("UPDATED Current state: ", currState);
+                  // hide game code share button
+                  document.getElementById("gameCodeShare").style.display = "none";
+                }
+
                 if (currState == "1") {
                   // show message "You are getting your role...Shh!🤫 Keep it secret"
+                  shhAudio.play();
                   document.getElementById("gameCodeShare").style.display =
                     "none";
                   mess.innerHTML =
@@ -655,12 +678,13 @@
           console.log("Current time: ", currentTime);
           console.log("Time diff: ", timeDiff);
 
-          if (timeDiff > 0) {
-            setTimeout(() => {
-              headLine.textContent = "Role Card";
-              showRoleCard();
-            }, timeDiff);
+          if (timeDiff < 0) {
+            timeDiff = 0;
           }
+          setTimeout(() => {
+            headLine.textContent = "Role Card";
+            showRoleCard();
+          }, timeDiff);
         } else if (currState == "2") {
           currState = "3";
           console.log("State 2 to 3");
@@ -674,28 +698,29 @@
           console.log("Current time: ", currentTime);
           console.log("Time diff: ", timeDiff);
 
-          if (timeDiff > 0) {
-            setTimeout(() => {
-              headLine.textContent = "Selection Time";
-
-              // show the title as per role
-              mess.textContent = "Remember your role and choose wisely";
-
-              radioList.innerHTML = "";
-              radioList.style.display = "block";
-
-              // show the list of alive players as radio buttons and add a submit button
-              alivePlayers.forEach((player) => {
-                if (player !== playername) {
-                  addPlayerRadio(player);
-                }
-              });
-
-              makeRadioBtnSound();
-
-              submitBtn.style.display = "block";
-            }, timeDiff);
+          if (timeDiff < 0) {
+            timeDiff = 0;
           }
+          setTimeout(() => {
+            headLine.textContent = "Selection Time";
+
+            // show the title as per role
+            mess.textContent = "Remember your role and choose wisely";
+
+            radioList.innerHTML = "";
+            radioList.style.display = "block";
+
+            // show the list of alive players as radio buttons and add a submit button
+            alivePlayers.forEach((player) => {
+              if (player !== playername) {
+                addPlayerRadio(player);
+              }
+            });
+
+            makeRadioBtnSound();
+
+            submitBtn.style.display = "block";
+          }, timeDiff);
         } else if (currState == "3") {
           currState = "4";
           console.log("State 3 to 4");
@@ -709,20 +734,20 @@
           console.log("Current time: ", currentTime);
           console.log("Time diff: ", timeDiff);
 
-          if (timeDiff > 0) {
-            setTimeout(() => {
-              // show last night details
-              (async function () {
-                await showLastNightDetails();
-                if (finalResults) {
-                  showFinalResults();
-                  return;
-                }
-                await showDiscussionRound();
-                await showVotingRound();
-              })();
-            }, timeDiff);
+          if (timeDiff < 0) {
+            timeDiff = 0;
           }
+          setTimeout(() => {
+            // show last night details
+            (async function () {
+              await showLastNightDetails();
+              if (finalResults) {
+                showFinalResults();
+                return;
+              }
+              await showDiscussionRound();
+            })();
+          }, timeDiff);
         } else if (currState == "4") {
           currState = "2";
           console.log("State 4 to 2");
@@ -736,29 +761,30 @@
           console.log("Current time: ", currentTime);
           console.log("Time diff: ", timeDiff);
 
-          if (timeDiff > 0) {
-            setTimeout(() => {
-              // Voting results are out
-              (async function () {
-                await show_votingResults();
-                if (finalResults) {
-                  showFinalResults();
-                  return;
-                } else {
-                  // next round
-                  await itsNightNow();
-
-                  // create a random time between 3 to 10 seconds
-                  var timeDiff = Math.floor(Math.random() * 7000) + 3000;
-
-                  setTimeout(() => {
-                    // show role card
-                    seenMyRole();
-                  }, timeDiff);
-                }
-              })();
-            }, timeDiff);
+          if (timeDiff < 0) {
+            timeDiff = 0;
           }
+          setTimeout(() => {
+            // Voting results are out
+            (async function () {
+              await show_votingResults();
+              if (finalResults) {
+                showFinalResults();
+                return;
+              } else {
+                // next round
+                await itsNightNow();
+
+                // create a random time between 3 to 10 seconds
+                var timeDiff = Math.floor(Math.random() * 7000) + 3000;
+
+                setTimeout(() => {
+                  // show role card
+                  seenMyRole();
+                }, timeDiff);
+              }
+            })();
+          }, timeDiff);
         }
       }
 
@@ -860,8 +886,25 @@
         headLine.textContent = "Discussion Round";
         mess.textContent = "Talk to each other to find the Killer";
         btmMessage.textContent = "We'll continue in 10 seconds";
-        await new Promise((resolve) => setTimeout(resolve, 10000)); // wait 10 seconds
+        // add Complete Discussion button
+        var completeDiscussionBtn = document.createElement("button");
+        completeDiscussionBtn.textContent = "Complete Discussion";
+        completeDiscussionBtn.id = "completeDiscussionBtn";
+        completeDiscussionBtn.addEventListener("click", completeDiscussion);
+        document
+          .getElementById("main-container")
+          .appendChild(completeDiscussionBtn);
         btmMessage.textContent = "";
+      }
+      function completeDiscussion() {
+        clickAudio.play();
+        document.getElementById("completeDiscussionBtn").style.display = "none";
+        radioList.innerHTML = "";
+        radioList.style.display = "none";
+        submitBtn.style.display = "none";
+        btmMessage.textContent = "";
+        btmMessage.textContent = "";
+        showVotingRound();
       }
       async function showVotingRound() {
         // voting round
@@ -1099,6 +1142,37 @@
         playerDetails.appendChild(playerDescription);
 
         playerInfo.appendChild(playerDetails);
+
+        if (ishost && playerName !== playername) {
+          const playerRemove = document.createElement("button");
+          playerRemove.textContent = "X";
+          playerRemove.classList.add("player-remove");
+          playerRemove.addEventListener("click", function () {
+            clickAudio.play();
+            if (confirm("Are you sure you want to remove this player?")) {
+              fetch(
+                `${url}/remove_player/${gamecode}/${hostcode}/${playerName}`
+              )
+                .then((response) => response.json())
+                .then((data) => {
+                  if ("stop" in data) {
+                    // go to spectator page
+                    window.removeEventListener("beforeunload", confirmExit);
+                    window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+                    return;
+                  }
+                  if ("error" in data) {
+                    // show error message
+                    toast(data["error"], "red");
+                    return;
+                  }
+                  toast(data["status"], "#0F9D58");
+                });
+            }
+          });
+
+          playerInfo.appendChild(playerRemove);
+        }
 
         playerCard.appendChild(playerInfo);
         players.appendChild(playerCard);

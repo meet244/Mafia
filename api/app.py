@@ -76,7 +76,7 @@ def createRoom():
     # create player object
     player = {'name': name, 'role': '', 'alive': True, 'is_pranked': False, 'is_killed': False, 'is_saved': False, 'is_suspected': False, 'vote_out_count': 0, 'is_host': True,'current_state_complete':False, 'host_code': hostCode}
     # create room object
-    room = {'_id': roomCode, 'players': [player], 'game_started': False, 'roles': roles, 'game_state':'1', 'next_state_time': '0', 'last_killed': '','police_susp':False, 'voted_out': '', 'was_voted_mafia':False, 'mafia_won':None}
+    room = {'_id': roomCode, 'players': [player], 'game_started': False, 'roles': roles, 'game_state':'1', 'prev_game_state':'0','next_state_time': '0', 'last_killed': '','police_susp':False, 'voted_out': '', 'was_voted_mafia':False, 'mafia_won':None}
     # insert room object into collection
     coll.insert_one(room)
     return jsonify({"status":"created","host_code":hostCode, "code":roomCode})
@@ -168,10 +168,11 @@ def start_game_host(code, host_code):
             # next state time = current time epoch in ms + 7 seconds
 
             doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
+            doc['prev_game_state'] = doc['game_state']
             doc['game_state'] = '2'
             
             # update room object
-            coll.update_one({'_id': code}, {'$set': {'game_started': True, 'players': players, 'roles': roles, 'next_state_time': doc['next_state_time'], 'game_state': doc['game_state']}})
+            coll.update_one({'_id': code}, {'$set': {'game_started': True, 'players': players, 'roles': roles, 'next_state_time': doc['next_state_time'], 'game_state': doc['game_state'], 'prev_game_state': doc['prev_game_state']}})
 
             return jsonify({"status":"Game started"})
         else:
@@ -200,6 +201,7 @@ def reset_game_host(code, host_code):
     host['alive'] = True
     doc['players'] = [host]
     doc['game_state'] = '1'
+    doc['prev_game_state'] = '0'
     doc['next_state_time'] = '0'
     doc['last_killed'] = ''
     doc['police_susp'] = False
@@ -217,10 +219,14 @@ def reset_game_host(code, host_code):
 def status_poll(code, player_state, name):
     # get players from room object
     doc = coll.find_one({'_id': code})
+
     if doc == None:
         return jsonify({"stop":"Game not found"})
 
-    if player_state == '1':
+    # if doc['prev_game_state'] == player_state:
+    #     rejoined = True
+
+    if doc['prev_game_state'] == '1':
         # if game is also in state 1
         if player_state == doc['game_state']:
             players_list = []
@@ -234,9 +240,9 @@ def status_poll(code, player_state, name):
         else:
             for p in doc['players']:
                 if p['name'] == name:
-                    return jsonify({"status":"update",'role':p['role'],'next_state_time':doc['next_state_time']})
+                    return jsonify({"status":"update",'role':p['role'],'next_state_time':doc['next_state_time'],'curr_state':doc['game_state'], 'prev_state':doc['prev_game_state']})
                 
-    elif player_state == '2':
+    elif doc['prev_game_state'] == '2':
         # if game is also in state 2
         if player_state == doc['game_state']:
             players_list_not_done = []
@@ -254,9 +260,9 @@ def status_poll(code, player_state, name):
                 alive.append(p['name'])
             else:
                 dead.append(p['name'])
-        return jsonify({"status":"update",'next_state_time':doc['next_state_time'],'alive':alive,'dead':dead})
+        return jsonify({"status":"update",'next_state_time':doc['next_state_time'],'alive':alive,'dead':dead,'curr_state':doc['game_state'], 'prev_state':doc['prev_game_state']})
     
-    elif player_state == '3':
+    elif doc['prev_game_state'] == '3':
         # if game is also in state 3
         if player_state == doc['game_state']:
             players_list_not_done = []
@@ -264,6 +270,7 @@ def status_poll(code, player_state, name):
                 if p['current_state_complete'] == False:
                     players_list_not_done.append(p['name'])
             return jsonify({"status":"wait", 'waiting_players':players_list_not_done})
+        
         
         # if game moved to state 4
         alive = []
@@ -282,12 +289,12 @@ def status_poll(code, player_state, name):
             for p in doc['players']:
                 player_roles.append({'name':p['name'],'role':p['role'],'alive':p['alive']})
             
-            return jsonify({"status":"update",'next_state_time':doc['next_state_time'], 'last_killed':doc['last_killed'], 'mafia_won': doc['mafia_won'], 'final_results': final_results, 'player_roles': player_roles})
+            return jsonify({"status":"update",'next_state_time':doc['next_state_time'], 'last_killed':doc['last_killed'], 'mafia_won': doc['mafia_won'], 'final_results': final_results, 'player_roles': player_roles, 'curr_state':doc['game_state'], 'prev_state':doc['prev_game_state']})
 
 
-        return jsonify({"status":"update",'next_state_time':doc['next_state_time'],'last_killed': doc['last_killed'],'police_susp':doc['police_susp'], 'alive':alive,'dead':dead, 'final_results': final_results, 'mafia_won': doc['mafia_won']})
+        return jsonify({"status":"update",'next_state_time':doc['next_state_time'],'last_killed': doc['last_killed'],'police_susp':doc['police_susp'], 'alive':alive,'dead':dead, 'final_results': final_results, 'mafia_won': doc['mafia_won'], 'curr_state':doc['game_state'], 'prev_state':doc['prev_game_state']})
     
-    elif player_state == '4':
+    elif doc['prev_game_state'] == '4':
         # if game is also in state 4
         if player_state == doc['game_state']:
             players_list_not_done = []
@@ -305,11 +312,11 @@ def status_poll(code, player_state, name):
             for p in doc['players']:
                 player_roles.append({'name':p['name'],'role':p['role'],'alive':p['alive']})
             
-            return jsonify({"status":"update",'next_state_time':doc['next_state_time'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won'], 'final_results': final_results, 'player_roles': player_roles})
+            return jsonify({"status":"update",'next_state_time':doc['next_state_time'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won'], 'final_results': final_results, 'player_roles': player_roles, 'curr_state':doc['game_state'], 'prev_state':doc['prev_game_state']})
 
 
         # send results, final results & time to next state
-        return jsonify({"status":"update",'next_state_time':doc['next_state_time'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won'], 'final_results': final_results})
+        return jsonify({"status":"update",'next_state_time':doc['next_state_time'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won'], 'final_results': final_results, 'curr_state':doc['game_state'], 'prev_state':doc['prev_game_state']})
     else:
         print(player_state)
         print(type(player_state))
@@ -333,16 +340,18 @@ def update_state_complete(code, name):
     if everyones_complete:
         # update state after everyone has completed choosing
         if doc['game_state'] == '2':
+            doc['prev_game_state'] = doc['game_state']
             doc['game_state'] = '3'
             # make all players state complete False
             for p in doc['players']:
                 p['current_state_complete'] = False
             # calc next state time and update
             doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
-            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players']}})
+            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'],'prev_game_state':doc['prev_game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players']}})
 
             return jsonify({"status":"done"})
         if doc['game_state'] == '3':
+            doc['prev_game_state'] = doc['game_state']
             doc['game_state'] = '4'
             # make all players state complete False
             for p in doc['players']:
@@ -400,10 +409,11 @@ def update_state_complete(code, name):
             # calc next state time and update
             doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
             
-            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'last_killed': doc['last_killed'], 'police_susp': doc['police_susp'], 'mafia_won': doc['mafia_won']}})
+            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'last_killed': doc['last_killed'], 'police_susp': doc['police_susp'], 'mafia_won': doc['mafia_won'], 'prev_game_state': doc['prev_game_state']}})
             
             return jsonify({"status":"done"})
         elif doc['game_state'] == '4':
+            doc['prev_game_state'] = doc['game_state']
             # update game_state and next_state_time when everyone has completed voting
             doc['game_state'] = '2'
             # make all players state complete False
@@ -465,7 +475,7 @@ def update_state_complete(code, name):
 
             # calc next state time and update
             doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
-            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won']}})
+            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won'], 'prev_game_state': doc['prev_game_state']}})
             return jsonify({"status":"done"})
 
     coll.update_one({'_id': code}, {'$set': {'players': doc['players']}})
@@ -586,6 +596,35 @@ def spectator(code):
 
     return jsonify({'alive':alive, 'dead':dead, 'final_results': final_results, 'mafia_won': doc['mafia_won'], 'player_roles': player_roles})
 
+@app.route('/remove_player/<string:code>/<string:host_code>/<string:player_name>', methods=['GET'])
+def remove_player_by_host(code, host_code, player_name):
+    doc = coll.find_one({'_id': code})
+    if doc == None:
+        return jsonify({"stop":"Game not found"})
+    # get players from room object
+    players = doc['players']
+    # check if player is host
+    for p in players:
+        if p['is_host']:
+            if p['host_code'] == host_code:
+            # remove player from players list
+                if player_name == p['name']:
+                    return jsonify({"error":"Host cannot remove themselves"})
+            
+                for p in players:
+                    if p['name'] == player_name:
+                        players.remove(p)
+                        break
+                # update players in room object
+                coll.update_one({'_id': code}, {'$set': {'players': players}})
+                return jsonify({"status":"Player removed"})
+            else:
+                return jsonify({"error":"Player is not host"})
+    return jsonify("Player not found")
+
+@app.route('/meet', methods=['GET'])
+def meet():
+    return redirect("https://github.com/meet244"), 302
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-		<link rel="icon" type="image/png" href="/static/images/logo.ico" />
+    <link rel="icon" type="image/png" href="/static/images/logo.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,19 +12,18 @@
       rel="stylesheet"
     />
     <style>
-      *{
-        font-family: 'Poetsen One', sans-serif;
+      * {
+        font-family: "Poetsen One", sans-serif;
         font-weight: 100;
         font-style: normal;
       }
 
-      a{
+      a {
         text-decoration: none;
         color: #ffffff;
       }
 
       h1 {
-
         font-size: 3em;
         color: #ffffff;
         text-align: center;
@@ -115,6 +114,13 @@
           );
         background-size: 55px 55px;
       }
+      #ftr-name {
+        position: absolute;
+        bottom: 2.75vh;
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+      }
 
       @media screen and (max-width: 768px) {
         /* Adjust styles for smaller screens */
@@ -123,6 +129,10 @@
           max-width: 100%;
           margin: 5px;
           height: calc(82vh - 70px);
+        }
+        #ftr-name {
+          font-size: 1em;
+          bottom: 1vh;
         }
       }
     </style>
@@ -156,7 +166,6 @@
 
       .flip-card-front,
       .flip-card-back {
-
         box-shadow: 0 8px 14px 0 rgba(255, 255, 0, 0.2);
         position: absolute;
         display: flex;
@@ -416,18 +425,9 @@
         <span class="slider"></span>
       </label>
     </div>
-    <div
-      style="
-        position: absolute;
-        bottom: 25px;
-        display: flex;
-        align-items: center;
-        font-size: 1.25em;
-      "
-    >
+    <div id="ftr-name">
       <span style="color: #ffffff"
-        >Made with 💖 by
-        <a href="/meet" target="_blank"> Meet Patel</a></span
+        >Made with ❤️ by <a href="/meet" target="_blank">Meet Patel</a></span
       >
     </div>
     <script>
@@ -461,10 +461,10 @@
         });
       });
 
-        var switchInput = document.querySelector(".switch input");
-        switchInput.addEventListener("click", function () {
-          selectAudio.play();
-        });
+      var switchInput = document.querySelector(".switch input");
+      switchInput.addEventListener("click", function () {
+        selectAudio.play();
+      });
     </script>
   </body>
 </html>

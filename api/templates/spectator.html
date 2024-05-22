@@ -195,6 +195,14 @@
         background-size: 55px 55px;
       }
 
+      #ftr-name {
+        position: absolute;
+        bottom: 2.75vh;
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+      }
+
       @media screen and (max-width: 768px) {
         /* Adjust styles for smaller screens */
         .container {
@@ -202,6 +210,10 @@
           max-width: 100%;
           margin: 5px;
           height: calc(82vh - 70px);
+        }
+        #ftr-name {
+          font-size: 1em;
+          bottom: 1vh;
         }
       }
     </style>

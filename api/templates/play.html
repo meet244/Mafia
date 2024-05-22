@@ -194,6 +194,14 @@
           );
         background-size: 55px 55px;
       }
+
+      #ftr-name {
+        position: absolute;
+        bottom: 2.75vh;
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+      }
     </style>
     <style>
       .flip-card {
@@ -334,7 +342,11 @@
           width: 95%;
         }
         .player-remove {
-          width: 18%;
+          width: 22%;
+        }
+        #ftr-name {
+          font-size: 1em;
+          bottom: 1vh;
         }
       }
     </style>
@@ -442,17 +454,9 @@
       <br />
       <h5 id="btmMessage"></h5>
     </div>
-    <div
-      style="
-        position: absolute;
-        bottom: 25px;
-        display: flex;
-        align-items: center;
-        font-size: 1.25em;
-      "
-    >
+    <div id="ftr-name">
       <span style="color: #ffffff"
-        >Made with 💖 by <a href="/meet" target="_blank"> Meet Patel</a></span
+        >Made with ❤️ by <a href="/meet" target="_blank">Meet Patel</a></span
       >
     </div>
 
@@ -604,9 +608,17 @@
                   currState = data["prev_state"];
                   console.log("UPDATED Current state: ", currState);
                   // hide game code share button
-                  document.getElementById("gameCodeShare").style.display = "none";
+                  document.getElementById("gameCodeShare").style.display =
+                    "none";
                 }
 
+                if (data["final_results"] == true) {
+                  if (currState == "1" || currState == "2") {
+                    // redirect to spectator page
+                    window.removeEventListener("beforeunload", confirmExit);
+                    window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+                  }
+                }
                 if (currState == "1") {
                   // show message "You are getting your role...Shh!🤫 Keep it secret"
                   shhAudio.play();
@@ -1056,6 +1068,7 @@
       }
 
       function startGame() {
+        clickAudio.play();
         fetch(`${url}/start_game/${gamecode}/${hostcode}`)
           .then((response) => response.json())
           .then((data) => {
@@ -1093,6 +1106,19 @@
                 // go to spectator page
                 window.removeEventListener("beforeunload", confirmExit);
                 window.location.href = `${url}/spectate?code=${gamecode}&name=${playername}`;
+                return;
+              }
+              if ("error" in data) {
+                // show error message
+                toast(data["error"], "red");
+                if (data["error"].includes("Game has already started")) {
+                  mess.textContent = "";
+                  headLine.textContent = "";
+                  document.getElementById("startGameDiv").style.display =
+                    "none";
+                  stopFetchingPlayers();
+                  pollState();
+                }
                 return;
               }
               var playersDiv = document.getElementById("players");

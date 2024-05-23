@@ -28,7 +28,7 @@
         font-size: 3em;
         color: #ffffff;
         text-align: center;
-        margin: 10px 0;
+        margin: 0px 0;
         margin-bottom: 0px;
       }
 
@@ -190,6 +190,14 @@
           );
         background-size: 55px 55px;
       }
+
+      #ftr-name {
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+        color: #ffffff;
+        bottom: 2.75vh;
+      }
     </style>
     <style>
       .input {
@@ -284,6 +292,10 @@
         }
         button {
           width: 95%;
+        }
+        #ftr-name {
+          font-size: 1em;
+          bottom: 1vh;
         }
       }
     </style>
@@ -421,18 +433,9 @@
         Join Game
       </button>
     </div>
-    <div
-      style="
-        position: absolute;
-        bottom: 25px;
-        display: flex;
-        align-items: center;
-        font-size: 1.25em;
-      "
-    >
+    <div id="ftr-name">
       <span style="color: #ffffff"
-        >Made with 💖 by 
-        <a href="/meet" target="_blank">Meet Patel</a></span
+        >Made with ❤️ by <a href="/meet" target="_blank">Meet Patel</a></span
       >
     </div>
     <script>

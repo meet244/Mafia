@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-		<link rel="icon" type="image/png" href="/static/images/logo.ico" />
+    <link rel="icon" type="image/png" href="/static/images/logo.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -23,7 +23,7 @@
         font-size: 3em;
         color: #ffffff;
         text-align: center;
-        margin: 10px 0;
+        margin: 0px 0;
         margin-bottom: 0px;
       }
 
@@ -126,6 +126,14 @@
           );
         background-size: 55px 55px;
       }
+
+      #ftr-name {
+        position: absolute;
+        bottom: 2.75vh;
+        display: flex;
+        align-items: center;
+        font-size: 1.25em;
+      }
     </style>
     <style>
       .input {
@@ -169,6 +177,10 @@
         button {
           width: 95%;
         }
+        #ftr-name {
+          font-size: 1em;
+          bottom: 1vh;
+        }
       }
     </style>
   </head>
@@ -204,18 +216,9 @@
         Create new Room
       </button>
     </div>
-    <div
-      style="
-        position: absolute;
-        bottom: 25px;
-        display: flex;
-        align-items: center;
-        font-size: 1.25em;
-      "
-    >
+    <div id="ftr-name">
       <span style="color: #ffffff"
-        >Made with 💖 by 
-        <a href="/meet" target="_blank">Meet Patel</a></span
+        >Made with ❤️ by <a href="/meet" target="_blank">Meet Patel</a></span
       >
     </div>
     <script>

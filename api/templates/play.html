@@ -31,7 +31,7 @@
         font-size: 3em;
         color: #ffffff;
         text-align: center;
-        margin: 20px 0;
+        margin: 0px 0;
         margin-bottom: 0px;
       }
 
@@ -396,7 +396,8 @@
         <div class="flip-card-inner">
           <div class="flip-card-front">
             <p class="title">Role Card</p>
-            <p>Click Me</p>
+            <img src="/static/images/logo.svg" alt="Image" style="display: block; margin: 25px auto; width: 90px; height: 90px;">
+            <p style="margin: 0;">Click Me</p>
           </div>
           <div class="flip-card-back">
             <p>Your Role</p>
@@ -487,7 +488,6 @@
       var selectAudio = new Audio(`${url}/static/audio/select.mp3`);
       var votedAudio = new Audio(`${url}/static/audio/voted.mp3`);
       var killedAudio = new Audio(`${url}/static/audio/killed.mp3`);
-      var gotKilledAudio = new Audio(`${url}/static/audio/got_killed.mp3`);
       var night_horrorAudio = new Audio(`${url}/static/audio/night_horror.mp3`);
       var suspenseAudio = new Audio(`${url}/static/audio/suspense.mp3`);
       var shhAudio = new Audio(`${url}/static/audio/shh.mp3`);
@@ -621,7 +621,6 @@
                 }
                 if (currState == "1") {
                   // show message "You are getting your role...Shh!🤫 Keep it secret"
-                  shhAudio.play();
                   document.getElementById("gameCodeShare").style.display =
                     "none";
                   mess.innerHTML =
@@ -694,6 +693,7 @@
             timeDiff = 0;
           }
           setTimeout(() => {
+            shhAudio.play();
             headLine.textContent = "Role Card";
             showRoleCard();
           }, timeDiff);
@@ -836,7 +836,7 @@
         } else {
           nxtcontent = `<span style="color: #34A853">${votedPlayer}</span> was not the Mafia`;
         }
-        if (votedPlayer != "nobody") {
+        if (votedPlayer != "Nobody") {
           // play voted sound
           votedAudio.play();
           if (iAmDead) {
@@ -860,30 +860,33 @@
         headLine.textContent = "Last Night";
         // clear the players list and everything else
         var iAmDead = false;
+
         if (lastKilled == playername) {
+          killedAudio.play();
           // play got_killed sound
-          gotKilledAudio.play();
           iAmDead = true;
           mess.innerHTML =
-            '<span style="color: #EA4335">You</span> were killed last night';
+            '<span style="color: #EA4335">You</span> were killed';
         } else {
           // play killed sound
-          killedAudio.play();
           if (lastKilled == "Nobody") {
             mess.innerHTML =
-              '<span style="color: #34A853">Nobody</span> was killed last night';
+              '<span style="color: #34A853">Nobody</span> was killed';
           } else {
-            mess.innerHTML = `Last night <span style="color: #EA4335">${lastKilled}</span> was killed`;
+            killedAudio.play();
+            mess.innerHTML = `<span style="color: #EA4335">${lastKilled}</span> was killed`;
           }
 
-          if (policeSusp) {
-            mess.innerHTML = mess.innerHTML =
-              mess.innerHTML +
-              ` & Police suspicion was <span style="color: #EA4335">Correct</span>`;
-          } else {
-            mess.innerHTML =
-              mess.innerHTML +
-              ` & Police suspicion was <span style="color: #EA4335">Wrong</span>`;
+          if (policeSusp != null) {
+            if (policeSusp) {
+              mess.innerHTML = mess.innerHTML =
+                mess.innerHTML +
+                ` & Police suspicion was <span style="color: #EA4335">Correct</span>`;
+            } else {
+              mess.innerHTML =
+                mess.innerHTML +
+                ` & Police suspicion was <span style="color: #EA4335">Wrong</span>`;
+            }
           }
 
           btmMessage.textContent = "We'll Continue in 10 seconds";
@@ -910,7 +913,7 @@
       }
       function completeDiscussion() {
         clickAudio.play();
-        document.getElementById("completeDiscussionBtn").style.display = "none";
+        document.getElementById("completeDiscussionBtn").remove();
         radioList.innerHTML = "";
         radioList.style.display = "none";
         submitBtn.style.display = "none";
@@ -1048,6 +1051,7 @@
         // make flip card invisible
         const flipCard = document.querySelector(".flip-card");
         flipCard.style.display = "none";
+        headLine.textContent = "";
 
         // Call API to indicate that the player has seen their role
         fetch(`${url}/update_state/${gamecode}/${playername}`)

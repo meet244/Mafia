@@ -76,7 +76,7 @@ def createRoom():
     # create player object
     player = {'name': name, 'role': '', 'alive': True, 'is_pranked': False, 'is_killed': False, 'is_saved': False, 'is_suspected': False, 'vote_out_count': 0, 'is_host': True,'current_state_complete':False, 'host_code': hostCode}
     # create room object
-    room = {'_id': roomCode, 'players': [player], 'game_started': False, 'roles': roles, 'game_state':'1', 'prev_game_state':'0','next_state_time': '0', 'last_killed': '','police_susp':False, 'voted_out': '', 'was_voted_mafia':False, 'mafia_won':None}
+    room = {'_id': roomCode, 'players': [player], 'game_started': False, 'roles': roles, 'game_state':'1', 'prev_game_state':'0','next_state_time': '0', 'last_killed': '','police_susp':None, 'voted_out': '', 'was_voted_mafia':False, 'mafia_won':None}
     # insert room object into collection
     coll.insert_one(room)
     return jsonify({"status":"created","host_code":hostCode, "code":roomCode})
@@ -206,7 +206,7 @@ def reset_game_host(code, host_code):
     doc['prev_game_state'] = '0'
     doc['next_state_time'] = '0'
     doc['last_killed'] = ''
-    doc['police_susp'] = False
+    doc['police_susp'] = None
     doc['voted_out'] = ''
     doc['was_voted_mafia'] = False
     doc['mafia_won'] = None
@@ -228,7 +228,7 @@ def status_poll(code, player_state, name):
     # if doc['prev_game_state'] == player_state:
     #     rejoined = True
 
-    if doc['prev_game_state'] == '1':
+    if doc['prev_game_state'] == '1' or doc['prev_game_state'] == '0':
         # if game is also in state 1
         if player_state == doc['game_state']:
             players_list = []
@@ -331,163 +331,169 @@ def update_state_complete(code, name):
         return jsonify({"stop":"Game not found"})
     everyones_complete = True
     # get players from room object and update current_state_complete
+    fonund = False
     for p in doc['players']:
         if p['alive']:
             if p['name'] == name:
+                fonund = True
                 p['current_state_complete'] = True
                 # print(f"{name} has completed work")
             if p['current_state_complete'] == False:
                 everyones_complete = False
-    # print("everyones_complete: ", everyones_complete)
+    if not fonund:
+        return jsonify({"error":"Player not found"})
     if everyones_complete:
-        # Check if game is over? before every game state update
-        checkCompleteCondition(code)
-
-        # update state after everyone has completed choosing
-        if doc['game_state'] == '2':
-            doc['prev_game_state'] = doc['game_state']
-            doc['game_state'] = '3'
-            # make all players state complete False
-            for p in doc['players']:
-                p['current_state_complete'] = False
-            # calc next state time and update
-            doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
-            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'],'prev_game_state':doc['prev_game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players']}})
-
-            return jsonify({"status":"done"})
-        if doc['game_state'] == '3':
-            doc['prev_game_state'] = doc['game_state']
-            doc['game_state'] = '4'
-            # make all players state complete False
-            for p in doc['players']:
-                p['current_state_complete'] = False
-
-            # calc results of dead(killed by mafia) and suspection
-            doc['last_killed'] = 'Nobody'
-            for p in doc['players']:
-                if p['is_pranked']:
-                    if p['role'] == 'mafia':
-                        for p1 in doc['players']:
-                            p1['is_killed'] = False
-                    elif p['role'] == 'doctor':
-                        for p1 in doc['players']:
-                            p1['is_saved'] = False
-                    elif p['role'] == 'police':
-                        for p1 in doc['players']:
-                            p1['is_suspected'] = False
-            for p in doc['players']:
-                if p['is_killed']:
-                    if p['is_saved']:
-                        p['is_killed'] = False
-                        p['is_saved'] = False
-                    else:
-                        p['alive'] = False
-                        doc['last_killed'] = p['name']
-                if p['is_suspected']:
-                    if p['role'] == 'mafia':
-                        doc['police_susp'] = True
-
-            # FINALE RESULTS CALCULATION
-            mafia_count = 0
-            villager_count = 0
-
-            # count the number of mafia and villagers
-            for p in doc['players']:
-                if p['role'] == 'mafia' and p['alive']:
-                    mafia_count += 1
-                elif p['role'] != 'mafia' and p['alive']:
-                    villager_count += 1
-
-            # check the win conditions
-            if mafia_count == 0:
-                doc['mafia_won'] = False
-            elif mafia_count >= villager_count:
-                doc['mafia_won'] = True
-
-            # make all players state complete False
-            for p in doc['players']:
-                p['is_killed'] = False
-                p['is_saved'] = False
-                p['is_suspected'] = False
-                p['is_pranked'] = False
-
-            # calc next state time and update
-            doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
-            
-            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'last_killed': doc['last_killed'], 'police_susp': doc['police_susp'], 'mafia_won': doc['mafia_won'], 'prev_game_state': doc['prev_game_state']}})
-            
-            return jsonify({"status":"done"})
-        elif doc['game_state'] == '4':
-            doc['prev_game_state'] = doc['game_state']
-            # update game_state and next_state_time when everyone has completed voting
-            doc['game_state'] = '2'
-            # make all players state complete False
-            for p in doc['players']:
-                p['current_state_complete'] = False
-            
-            # calc results of voting
-            alive_players = 0
-            skipped_cnt = 0
-            max_vote = 0
-            total_vote = 0
-            max_voted = ''
-            for p in doc['players']:
-                if p['alive']:
-                    alive_players += 1
-                    if p['vote_out_count'] > max_vote:
-                        max_vote = p['vote_out_count']
-                        max_voted = p['name']
-                    elif p['vote_out_count'] == max_vote:
-                        max_voted = 'tie'
-                    total_vote += p['vote_out_count']
-
-            skipped_cnt = alive_players - total_vote
-            if skipped_cnt > max_vote:
-                max_voted = 'skip'
-            if max_voted == 'skip':
-                doc['voted_out'] = 'Nobody'
-
-            if max_voted != 'tie':
-                for p in doc['players']:
-                    if p['name'] == max_voted:
-                        p['alive'] = False
-                        doc['voted_out'] = p['name']
-                        if p['role'] == 'mafia':
-                            doc['was_voted_mafia'] = True
-                        break
-            else:
-                doc['voted_out'] = 'No one'
-            # make all players state complete False
-            for p in doc['players']:
-                p['vote_out_count'] = 0
-
-            # FINALE RESULTS CALCULATION
-            mafia_count = 0
-            villager_count = 0
-
-            # count the number of mafia and villagers
-            for p in doc['players']:
-                if p['role'] == 'mafia' and p['alive']:
-                    mafia_count += 1
-                elif p['role'] != 'mafia' and p['alive']:
-                    villager_count += 1
-
-            # check the win conditions
-            if mafia_count == 0:
-                doc['mafia_won'] = False
-            elif mafia_count >= villager_count:
-                doc['mafia_won'] = True                
-
-            # calc next state time and update
-            doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
-            coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won'], 'prev_game_state': doc['prev_game_state']}})
-            return jsonify({"status":"done"})
+        return update_state(doc, code)
 
     coll.update_one({'_id': code}, {'$set': {'players': doc['players']}})
     return jsonify({"status":"done"})
-def checkCompleteCondition(code):
+def update_state(doc, code):
+
+    checkCompleteCondition(doc,code)
+
+    # update state after everyone has completed choosing
+    if doc['game_state'] == '2':
+        doc['prev_game_state'] = doc['game_state']
+        doc['game_state'] = '3'
+        # make all players state complete False
+        for p in doc['players']:
+            p['current_state_complete'] = False
+        # calc next state time and update
+        doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
+        coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'],'prev_game_state':doc['prev_game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players']}})
+
+        return jsonify({"status":"done"})
+    elif doc['game_state'] == '3':
+        doc['prev_game_state'] = doc['game_state']
+        doc['game_state'] = '4'
+        # make all players state complete False
+        for p in doc['players']:
+            p['current_state_complete'] = False
+
+        # calc results of dead(killed by mafia) and suspection
+        doc['last_killed'] = 'Nobody'
+        for p in doc['players']:
+            if p['is_pranked']:
+                if p['role'] == 'mafia':
+                    for p1 in doc['players']:
+                        p1['is_killed'] = False
+                elif p['role'] == 'doctor':
+                    for p1 in doc['players']:
+                        p1['is_saved'] = False
+                elif p['role'] == 'police':
+                    for p1 in doc['players']:
+                        p1['is_suspected'] = False
+        for p in doc['players']:
+            if p['is_killed']:
+                if p['is_saved']:
+                    p['is_killed'] = False
+                    p['is_saved'] = False
+                else:
+                    p['alive'] = False
+                    doc['last_killed'] = p['name']
+            if p['is_suspected']:
+                if p['role'] == 'mafia':
+                    doc['police_susp'] = True
+                else:
+                    doc['police_susp'] = False
+
+        # FINALE RESULTS CALCULATION
+        mafia_count = 0
+        villager_count = 0
+
+        # count the number of mafia and villagers
+        for p in doc['players']:
+            if p['role'] == 'mafia' and p['alive']:
+                mafia_count += 1
+            elif p['role'] != 'mafia' and p['alive']:
+                villager_count += 1
+
+        # check the win conditions
+        if mafia_count == 0:
+            doc['mafia_won'] = False
+        elif mafia_count >= villager_count:
+            doc['mafia_won'] = True
+
+        # make all players state complete False
+        for p in doc['players']:
+            p['is_killed'] = False
+            p['is_saved'] = False
+            p['is_suspected'] = False
+            p['is_pranked'] = False
+
+        # calc next state time and update
+        doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
+        
+        coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'last_killed': doc['last_killed'], 'police_susp': doc['police_susp'], 'mafia_won': doc['mafia_won'], 'prev_game_state': doc['prev_game_state']}})
+        
+        return jsonify({"status":"done"})
+    elif doc['game_state'] == '4':
+        doc['prev_game_state'] = doc['game_state']
+        # update game_state and next_state_time when everyone has completed voting
+        doc['game_state'] = '2'
+        # make all players state complete False
+        for p in doc['players']:
+            p['current_state_complete'] = False
+        
+        # calc results of voting
+        alive_players = 0
+        skipped_cnt = 0
+        max_vote = 0
+        total_vote = 0
+        max_voted = ''
+        for p in doc['players']:
+            if p['alive']:
+                alive_players += 1
+                if p['vote_out_count'] > max_vote:
+                    max_vote = p['vote_out_count']
+                    max_voted = p['name']
+                elif p['vote_out_count'] == max_vote:
+                    max_voted = 'tie'
+                total_vote += p['vote_out_count']
+
+        skipped_cnt = alive_players - total_vote
+        if skipped_cnt > max_vote:
+            max_voted = 'skip'
+        if max_voted == 'skip':
+            doc['voted_out'] = 'Nobody'
+
+        if max_voted != 'tie':
+            for p in doc['players']:
+                if p['name'] == max_voted:
+                    p['alive'] = False
+                    doc['voted_out'] = p['name']
+                    if p['role'] == 'mafia':
+                        doc['was_voted_mafia'] = True
+                    break
+        else:
+            doc['voted_out'] = 'No one'
+        # make all players state complete False
+        for p in doc['players']:
+            p['vote_out_count'] = 0
+
+        # FINALE RESULTS CALCULATION
+        mafia_count = 0
+        villager_count = 0
+
+        # count the number of mafia and villagers
+        for p in doc['players']:
+            if p['role'] == 'mafia' and p['alive']:
+                mafia_count += 1
+            elif p['role'] != 'mafia' and p['alive']:
+                villager_count += 1
+
+        # check the win conditions
+        if mafia_count == 0:
+            doc['mafia_won'] = False
+        elif mafia_count >= villager_count:
+            doc['mafia_won'] = True                
+
+        # calc next state time and update
+        doc['next_state_time'] = str(int(time.time() * 1000) + 7000)
+        coll.update_one({'_id': code}, {'$set': {'game_state': doc['game_state'], 'next_state_time': doc['next_state_time'], 'players': doc['players'], 'voted_out': doc['voted_out'], 'was_voted_mafia': doc['was_voted_mafia'], 'mafia_won': doc['mafia_won'], 'prev_game_state': doc['prev_game_state']}})
+        return jsonify({"status":"done"})
+def checkCompleteCondition(doc,code):
     # check if game is over
-    doc = coll.find_one({'_id': code})
     if doc == None:
         return 
     mafia_count = 0
@@ -637,14 +643,27 @@ def remove_player_by_host(code, host_code, player_name):
             # remove player from players list
                 if player_name == p['name']:
                     return jsonify({"error":"Host cannot remove themselves"})
-            
+
                 for p in players:
                     if p['name'] == player_name:
-                        players.remove(p)
+                        if doc['game_started'] == True:
+                            p['alive'] = False
+                        else:
+                            players.remove(p)
                         break
                 # update players in room object
                 coll.update_one({'_id': code}, {'$set': {'players': players}})
-                checkCompleteCondition(code)
+                
+                # if removed the last player waiting - update state
+                everyones_complete = True
+                for p in players:
+                    if p['alive']:
+                        if p['current_state_complete'] == False:
+                            everyones_complete = False
+                            break
+                if everyones_complete:
+                    update_state(doc, code)
+
                 return jsonify({"status":"Player removed"})
             else:
                 return jsonify({"error":"Player is not host"})

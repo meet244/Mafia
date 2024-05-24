@@ -77,6 +77,8 @@ For a visual representation of the game flow and states, refer to the diagram gi
       <img src="https://github.com/meet244/Mafia/assets/83262693/a9f0a62f-2d0d-414d-b5ea-0031236d86fa" alt="Designs (low fidelity)"/>
 </details>
 
+All game dev components used can be found [here](https://mafia-play.vercel.app/ui).
+
 ## Background 📜
 
 The game was inspired by the traditional Mafia game played with friends using chats and a human host. This digital version automates the process, making it faster and more convenient, allowing everyone to participate without the need for a dedicated host.

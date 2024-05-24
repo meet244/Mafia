@@ -318,7 +318,7 @@
       var localGameCode = localStorage.getItem("gameCode");
       var localHostCode = localStorage.getItem("hostCode");
       var localPlayerName = localStorage.getItem("playerName");
-      console.log(localHostCode == null);
+      // console.log(localHostCode == null);
       if (gamecode == localGameCode) {
         if (localHostCode != null) {
           iAmHost = true;
@@ -342,7 +342,7 @@
             let playerRoles = data["player_roles"];
 
             if (finalResults) {
-              console.log("I am host: ", iAmHost);
+              // console.log("I am host: ", iAmHost);
               if (iAmHost) {
                 document.getElementById("startGame").style.display = "block";
               } else {

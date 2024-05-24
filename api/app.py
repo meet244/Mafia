@@ -62,8 +62,8 @@ def createRoom():
         roomCode = ''.join(random.choices('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=6))
         exists = coll.find_one({'_id': roomCode})
 
-    roomCode = '1234'
-    hostCode = 'host123'
+    # roomCode = '1234'
+    # hostCode = 'host123'
 
     roles = ['mafia']
     if is_prankster:

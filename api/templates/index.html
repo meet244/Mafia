@@ -272,15 +272,15 @@
       function updateState() {
         if (currState == "1") {
           currState = "2";
-          console.log("State 1 to 2");
-          console.log("Role: ", role);
+          // console.log("State 1 to 2");
+          // console.log("Role: ", role);
           // show role on time(nextStateTime)
           var currentTime = Math.floor(Date.now());
           var timeDiff = nextStateTime - currentTime;
 
-          console.log("Next state time: ", nextStateTime);
-          console.log("Current time: ", currentTime);
-          console.log("Time diff: ", timeDiff);
+          // console.log("Next state time: ", nextStateTime);
+          // console.log("Current time: ", currentTime);
+          // console.log("Time diff: ", timeDiff);
 
           if (timeDiff > 0) {
             setTimeout(() => {
@@ -294,16 +294,16 @@
           }
         } else if (currState == "2") {
           currState = "3";
-          console.log("State 2 to 3");
-          console.log("Alive players: ", alivePlayers);
-          console.log("Dead players: ", deadPlayers);
+          // console.log("State 2 to 3");
+          // console.log("Alive players: ", alivePlayers);
+          // console.log("Dead players: ", deadPlayers);
 
           var currentTime = Math.floor(Date.now());
           var timeDiff = nextStateTime - currentTime;
 
-          console.log("Next state time: ", nextStateTime);
-          console.log("Current time: ", currentTime);
-          console.log("Time diff: ", timeDiff);
+          // console.log("Next state time: ", nextStateTime);
+          // console.log("Current time: ", currentTime);
+          // console.log("Time diff: ", timeDiff);
 
           if (timeDiff > 0) {
             setTimeout(() => {
@@ -354,16 +354,16 @@
           }
         } else if (currState == "3") {
           currState = "4";
-          console.log("State 3 to 4");
-          console.log("Last killed: ", lastKilled);
-          console.log("Police suspicion: ", policeSusp);
+          // console.log("State 3 to 4");
+          // console.log("Last killed: ", lastKilled);
+          // console.log("Police suspicion: ", policeSusp);
 
           var currentTime = Math.floor(Date.now());
           var timeDiff = nextStateTime - currentTime;
 
-          console.log("Next state time: ", nextStateTime);
-          console.log("Current time: ", currentTime);
-          console.log("Time diff: ", timeDiff);
+          // console.log("Next state time: ", nextStateTime);
+          // console.log("Current time: ", currentTime);
+          // console.log("Time diff: ", timeDiff);
 
           if (timeDiff > 0) {
             setTimeout(() => {
@@ -385,16 +385,16 @@
           }
         } else if (currState == "4") {
           currState = "2";
-          console.log("State 4 to 2");
-          console.log("Alive players: ", alivePlayers);
-          console.log("Dead players: ", deadPlayers);
+          // console.log("State 4 to 2");
+          // console.log("Alive players: ", alivePlayers);
+          // console.log("Dead players: ", deadPlayers);
 
           var currentTime = Math.floor(Date.now());
           var timeDiff = nextStateTime - currentTime;
 
-          console.log("Next state time: ", nextStateTime);
-          console.log("Current time: ", currentTime);
-          console.log("Time diff: ", timeDiff);
+          // console.log("Next state time: ", nextStateTime);
+          // console.log("Current time: ", currentTime);
+          // console.log("Time diff: ", timeDiff);
 
           if (timeDiff > 0) {
             setTimeout(() => {
@@ -471,7 +471,7 @@
         var playAgain = document.createElement("button");
         playAgain.textContent = "Play Mafia Again";
         playAgain.onclick = () => {
-          console.log("Play again clicked");
+          // console.log("Play again clicked");
         };
         playersDiv.appendChild(playAgain);
       }
@@ -617,7 +617,7 @@
 
       function selected_vote() {
         var vote = document.querySelector('input[name="player"]:checked').value;
-        console.log("Selected vote: ", vote);
+        // console.log("Selected vote: ", vote);
         fetch(`${url}/selected_vote/${gamecode}/${playername}/${vote}`)
           .then((response) => response.json())
           .then((data) => {
@@ -638,7 +638,7 @@
         var target = document.querySelector(
           'input[name="player"]:checked'
         ).value;
-        console.log("Selected target: ", target);
+        // console.log("Selected target: ", target);
         fetch(`${url}/selected_target/${gamecode}/${playername}/${target}`)
           .then((response) => response.json())
           .then((data) => {
@@ -704,7 +704,7 @@
           .then((data) => {
             if (data["status"] == "done") {
               // Now wait for other players to see their roles and
-              console.log("Player role update complete");
+              // console.log("Player role update complete");
               pollState();
             }
           });

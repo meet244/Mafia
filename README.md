@@ -48,26 +48,6 @@ Welcome to Mafia, a thrilling social deduction game where deception and strategy
 
 The game continues until either the Mafia is voted out or the Mafia successfully kills all other players.
 
-## How to Play
-
-1. **Start the Game**
-   - Visit the game link [here](#).
-   - Enter your name and join a room.
-   
-2. **Host Starts the Game**
-   - The host starts the game, and roles are distributed.
-   
-3. **Night and Day Phases**
-   - Follow the instructions based on your role.
-   - Discuss, vote, and try to deduce who the Mafia is.
-
-## Sound Effects
-
-The game features various sound effects to make the experience more engaging:
-- **Kill Sound**: Plays when someone is killed at night.
-- **Vote Sound**: Plays during the voting phase.
-- **Elimination Sound**: Plays when someone is voted out.
-
 ## Flow Diagram
 
 For a visual representation of the game flow and states, refer the diagram given below.

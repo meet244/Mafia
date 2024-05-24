@@ -79,6 +79,27 @@ For a visual representation of the game flow and states, refer to the diagram gi
 
 All game dev components used can be found [here](https://mafia-play.vercel.app/ui).
 
+## File Structure
+
+Mafia game project structure:
+
+- **API Folder** 📁
+     1. `app.py`: Main server file.🖥️
+     2. `templates` folder:📄
+	      - `create.html`: Create a new game room.
+	      - `index.html`: Check if the game is working (old play.html).
+	      - `join.html`: Join a game room.
+	      - `landing.html`: Landing page for the main game.
+	      - `main.html`: Previous landing page (old landing.html).
+	      - `play.html`: Main file for playing the game.
+	      - `spectator.html`: Spectator page to watch the game.
+	      - `UI.html`: Basic UI components for development.
+
+   3. `Static` folder:🖼️🔊
+	     - `assets` folder: SVG images.
+	     - `audio` folder: Audio files.
+	     - `images` folder: JPG or PNG images.
+
 ## Background 📜
 
 The game was inspired by the traditional Mafia game played with friends using chats and a human host. This digital version automates the process, making it faster and more convenient, allowing everyone to participate without the need for a dedicated host.

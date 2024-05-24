@@ -1,6 +1,6 @@
-# Mafia - Can you survive tonight?
+![Frame 22](https://github.com/meet244/Mafia/assets/83262693/68fa0e70-b5c8-43f4-93fb-efc360e67c5f)
 
-Mafia is a thrilling social deduction game where deception and strategy are key to survival. This game is developed using HTML, CSS, and JavaScript, with a Flask backend hosted on Vercel. Playable on both mobile and desktop screens, Mafia offers an engaging experience for all players. The game includes sound effects to enhance the experience, with audio cues for kills, votes, and other key moments.
+[Mafia](https://mafia-play.vercel.app/) is a thrilling social deduction game where deception and strategy are key to survival. This game is developed using HTML, CSS, and JavaScript, with a Flask backend hosted on Vercel. Playable on both mobile and desktop screens, Mafia offers an engaging experience for all players. The game includes sound effects to enhance the experience, with audio cues for kills, votes, and other key moments.
 
 ## Game Rules
 
@@ -18,34 +18,22 @@ Mafia is a thrilling social deduction game where deception and strategy are key 
 
 ## Game Flow
 
-<details>
-   <br>
-  <summary><strong>Joining the Game</strong></summary>
-  <p>Go to <a href="https://mafia-play.vercel.app/" target="_blank">MAFIA website</a>. Enter your name and join a room. You can create a new room or join an existing one. The host will start the game, and each player will receive a role card.</p>
-</details>
+### Joining the Game
+Go to [MAFIA website](https://mafia-play.vercel.app/). Enter your name and join a room. You can create a new room or join an existing one. The host will start the game, and each player will receive a role card.
 
-<details>
-   <br>
-  <summary><strong>Night Phase</strong></summary>
-  <p>Depending on your role, you will perform the following actions:</p>
-  <ul>
-    <li><strong>Mafia</strong>: Choose one player to kill.</li>
-    <li><strong>Doctor</strong>: Choose one player to save.</li>
-    <li><strong>Police</strong>: Choose one player to investigate.</li>
-    <li><strong>Prankster</strong>: Choose one player to prank.</li>
-    <li><strong>Civilian</strong>: Your choice does not affect the game.</li>
-  </ul>
-</details>
+### Night Phase
+Depending on your role, you will perform the following actions:
+- **Mafia**: Choose one player to kill.
+- **Doctor**: Choose one player to save.
+- **Police**: Choose one player to investigate.
+- **Prankster**: Choose one player to prank.
+- **Civilian**: Your choice does not affect the game.
 
-<details>
-   <br>
-  <summary><strong>Day Phase</strong></summary>
-  <ul>
-    <li><strong>Discussion Round</strong>: Players discuss who they think the Mafia is.</li>
-    <li><strong>Voting Round</strong>: Players vote on who they think the Mafia is.</li>
-    <li><strong>Voting Results</strong>: If the Mafia is voted out, the game ends. If not, the game continues to the next night phase.</li>
-  </ul>
-</details>
+### Day Phase
+- **Discussion Round**: Players discuss who they think the Mafia is.
+- **Voting Round**: Players vote on who they think the Mafia is.
+- **Voting Results**: If the Mafia is voted out, the game ends. If not, the game continues to the next night phase.
+
 
 ### Winning the Game
 
@@ -63,11 +51,7 @@ The game continues until either the Mafia is voted out or the Mafia successfully
 <img src="https://github.com/meet244/Mafia/assets/83262693/fa6c620e-da80-4fb0-be58-6019c81dc700" alt="m5" height="430" width="216" />
 <img src="https://github.com/meet244/Mafia/assets/83262693/da46f970-343f-44e7-98ca-4e1bbd83366f" alt="m6" height="430" width="216" />
 <img src="https://github.com/meet244/Mafia/assets/83262693/e82159e8-c28a-47ca-a151-473dce26671d" alt="m7" height="430" width="216" />
-
-
-
-
-
+   
 </details>
 <details>
    <br>
